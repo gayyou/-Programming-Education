@@ -1,0 +1,53 @@
+import Vue from 'vue';
+import Vuex from 'vuex';
+
+Vue.use(Vuex)
+
+export default new Vuex.Store({
+  state: {
+    isStart: true,
+    isRenew: false,
+    point: '',
+    close: true,
+    loadingFadeIn: false,
+    str: '正在云编译中',
+    showLogin: false,
+    showRegist: false,
+    showConfirm: false,
+    isLogin: true,
+    isInput: null,
+    isCode: true,
+    elCount: 0,
+    comCount: 0,
+    moveTarget: null,
+    fakeTarget: null,
+    model: {
+      x: null,
+      y: null,
+      type: null,
+      value: null
+    },
+    bashX: 0,
+    bashY: 0,
+    mouse: {
+      x: null,
+      y: null,
+    },
+    canvasList: {
+      
+    },
+    // 编辑模式左边选择框的模式，一共有 1 2 3 4
+    leftStatus: 1,
+
+    // 下面是推荐模式所独有的store
+
+    // 1是按照最新发布排序  2 是按照最快上升排序  3 是按照评分高的排序
+    sortOrder: 1
+  },
+  mutations: {
+
+  },
+  actions: {
+
+  }
+})
