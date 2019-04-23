@@ -1,4 +1,4 @@
-import { svgComponentOption } from './shared/model.js'
+import { svgComponentOption } from '../shared/model.js'
 /**
  * @description 判断是否碰撞了，返回碰撞的一个对象，对象的内容有 碰撞对象、碰撞部分
  * @param {*} target 

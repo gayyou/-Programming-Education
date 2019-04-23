@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { nestWhileOperate } from '../../utils/drag.js';
+import { nestWhileOperate } from '../../utils/svgOperate/changeSvgContainer.js';
 import { cloneList } from '../../utils/listUtils.js';
 import PubSub from 'pubsub-js'
 import recList from './recList/recList.vue';

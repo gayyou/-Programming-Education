@@ -64,55 +64,6 @@
           </cc:Work>
         </rdf:RDF>
       </metadata>
-      <!-- <circles
-        v-for="(item) in $store.state.elInfo.circle"
-        :value="item.value"
-        :y="item.y"
-        :key="item.id"
-        :model="false"
-      ></circles>
-      <assist
-        v-for="(item) in $store.state.elInfo.assist"
-        :value="item.value"
-        :y="item.y"
-        :key="item.id"
-        :model="false"
-      ></assist>
-      <condition
-        v-for="(item) in $store.state.elInfo.condition"
-        :value="item.value"
-        :y="item.y"
-        :key="item.id"
-        :model="false"
-      ></condition>
-      <judge
-        v-for="(item) in $store.state.elInfo.judge"
-        :value="item.value"
-        :y="item.y"
-        :key="item.id"
-        :model="false"
-      ></judge>
-      <noRefFunc
-        v-for="(item) in $store.state.elInfo.noRefFunc"
-        :value="item.value"
-        :y="item.y"
-        :key="item.id"
-        :model="false"
-      ></noRefFunc>
-      <order
-        v-for="(item) in $store.state.elInfo.order"
-        :value="item.value"
-        :y="item.y"
-        :key="item.id"
-        :model="false"
-      ></order>
-      <refFunc
-        v-for="(item) in $store.state.elInfo.refFunc"
-        :value="item.value"
-        :y="item.y"
-        :key="item.id"
-        :model="false"
-      ></refFunc> -->
       <noRefFunc
         v-for="item in $store.state.canvasList.noRefFunc"
         :key="item.id"
@@ -421,9 +372,9 @@ import condition from '../logicAssets/condition/condition.vue'
 import noRefFunc from '../logicAssets/noRefFunc/noRefFunc.vue'
 import assist from '../logicAssets/assist/assist.vue'
 import Vue from 'vue';
-import { isCrash } from '../../utils/checkCrash.js'
+import { isCrash } from '../../utils/svgOperate/checkCrash.js'
 import { renewList, findList } from '../../utils/listUtils.js'
-import { nestWhileOperate, nestJudgeOperate } from '../../utils/drag.js'
+import { nestOperate, spiltOperate } from '../../utils/svgOperate/drag.js'
 import { componentListMixin } from '../../utils/shared/model.js'
 
 export default {
@@ -448,6 +399,9 @@ export default {
   },
   mounted() {
     componentListMixin(this.$store.state.canvasList);
+    setTimeout(() => {
+      console.log(this.$store.state.canvasList);
+    }, 0);
   },
   methods: {
     dragStart(event) {
@@ -478,30 +432,30 @@ export default {
       if (this.$store.state.moveTarget) {
         
         let target = this.$store.state.moveTarget;
-        console.log('找元素' ,findList(target, this.$store.state.canvasList));
+        let clickList = findList(target, this.$store.state.canvasList);
         let type = target.getAttribute('data-type');
         let result = isCrash(target, this.$store.state.canvasList);
         
         if (result) {
-          let type = result.container.getAttribute('data-type');
-          switch(type) {
-            case 'circle': {
-              nestWhileOperate.bind(this)(target, result.container, this.$store.state.canvasList);
-              break;
-            }
-            case 'judge': {
-              // 这里会有一个bug，就是先在else语句中添加语句的话，继续添加的if语句中的块，会出差错，原因是else的块没有进行处理
-              if (result.dirY == 1) {
-                nestJudgeOperate.bind(this)(target, result.container, this.$store.state.canvasList, true);
-              } else {
-                nestJudgeOperate.bind(this)(target, result.container, this.$store.state.canvasList, false);
-              }
-              break;
-            }
-          }
+          let targetList = findList(target, this.$store.state.canvasList);
 
+          if (targetList == this.$store.state.canvasList) {
+            // 如果得到target是基础的list，那么得到是在嵌合
+            nestOperate.call(this, target, result, this.$store.state.canvasList);
+          } else {
+            
+          }
           // target指向容器，重新渲染容器的宽高
           target = result.container;
+        } else {
+          let targetList = findList(target, this.$store.state.canvasList);
+
+          if (targetList !== this.$store.state.canvasList) {
+            let conTarget = $(target).parent()[0];
+            spiltOperate.call(this, target, conTarget, targetList, this.$store.state.canvasList)
+            target = conTarget; // 只需要修改conTarget的值
+          }
+          
         }
         
         renewList(this.$store.state.canvasList, target);

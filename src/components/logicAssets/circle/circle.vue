@@ -26,6 +26,17 @@
       :value="item.value"
     ></noRefFunc>
     <circles
+      v-for="item in $data.contain.circle"
+      :key="item.id"
+      :containObject="item.contain"
+      :y="item.y"
+      :x="item.x"
+      :id="item.id"
+      :value="item.value"
+      :model="false"
+      :hasCdn="item.hasCdn"
+    ></circles>
+    <!-- <circles
       v-if="containObject || model"
       v-for="item in $data.contain.circle"
       :key="item.id"
@@ -35,7 +46,7 @@
       :id="item.id"
       :value="item.value"
       :hasCdn="item.hasCdn"
-    ></circles>
+    ></circles> -->
     <judge
       v-if="containObject || model"
       v-for="item in $data.contain.judge"
