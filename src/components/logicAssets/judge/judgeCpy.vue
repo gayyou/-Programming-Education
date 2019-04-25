@@ -1,20 +1,27 @@
 <template>
   <g
-    class="circle"
-    data-type="circle"
-    :transform="'translate('+ x +','+ y +')'"
-    data-currentBash="24"
-    data-currentY="48"
-    :id="id"
-  >
+     data-type="judge"
+     data-currentY="48"
+     data-currentSecondY="120"
+     data-firstBash="24"
+     data-secondBash="-16"
+     data-textBash="100"
+     data-firstTime="1"
+     class="judge"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     :transform="'translate('+ x +','+ y +')'"
+     :id="id">
     <g>
-      <path class="st0 out-line" d="M184.2,0H12C5.4,0,0,5.4,0,12v36v24v12c0,6.6,5.4,12,12,12h62c6.6,0,12-5.4,12-12v0c0-6.6-5.4-12-12-12H28
-        c-2.2,0-4-1.8-4-4V52c0-2.2,1.8-4,4-4h156.2c13.3,0,24-10.7,24-24v0C208.2,10.7,197.4,0,184.2,0z"/>
-      <polygon class="st1 poly" :style="hasCdn ? 'display: none' : 'display: block'" points="172.2,11.4 148.2,11.4 136.2,24.4 148.2,37.4 172.2,37.4 184.2,24.4 	"/>
+      <path class="st0 out-line" d="M140,24L140,24c0-13.3-10.7-24-24-24L12,0C5.4,0,0,5.4,0,12v36v24v48v24v12c0,6.6,5.4,12,12,12h46
+        c6.6,0,12-5.4,12-12v0c0-6.6-5.4-12-12-12H28c-2.2,0-4-1.8-4-4v-16c0-2.2,1.8-4,4-4h88c13.3,0,24-10.7,24-24v0
+        c0-13.3-10.7-24-24-24H28c-2.2,0-4-1.8-4-4V52c0-2.2,1.8-4,4-4h88C129.3,48,140,37.3,140,24z"/>
+      <text transform="matrix(1 0 0 1 24.3335 30.3763)" class="st1 st2 st3">如果</text>
+      <text transform="matrix(1 0 0 1 24.3335 100.3763)" class="st1 st2 st3 else">否则</text>
+      <polygon class="st4" :style="hasCdn ? 'display: none' : 'display: block'" points="106,12.3 82,12.3 70,25.3 82,38.3 106,38.3 118,25.3 	"/>
       <g transform="translate(170,0)" :style="hasCdn ? 'display: block' : 'display: none'" class="extend-line">
         <path class="st0" d="M138,48H12C5.4,48,0,42.6,0,36V12C0,5.4,5.4,0,12,0l126,0c13.3,0,24,10.7,24,24v0C162,37.3,151.3,48,138,48z"	/>
       </g>
-      <text transform="matrix(1 0 0 1 23.3337 30.7092)" class="st2 st3 st4">执行命令直到</text>
     </g>
     <noRefFunc
       v-for="item in $data.contain.noRefFunc"
@@ -53,6 +60,7 @@
       :value="item.value"
     ></assist>
     <condition
+      
       v-for="item in $data.contain.condition"
       :key="item.id"
       :y="item.y"
@@ -69,6 +77,11 @@
       :value="item.value"
     ></order>
     <div v-if="$store.state.isRenew"></div>
+    <!-- <noRefFunc
+      :model="false"
+      :y="120"
+      :value="'123'"
+    ></noRefFunc>-->
   </g>
 </template>
 
@@ -78,19 +91,19 @@ import { componentListMixin } from '../../../utils/shared/model.js'
 import noRefFunc from '../noRefFunc/noRefFunc.vue'
 import condition from '../condition/condition.vue'
 import judge from '../judge/judge.vue'
-import circles from './circleCpy.vue'
+import circles from '../circle/circle.vue'
 import assist from '../assist/assist.vue'
 import order from '../order/order.vue'
 
 export default {
-  props: ['model', 'y', 'value', 'containObject', 'x', 'id', 'hasCdn'],
+  props: ['model', 'y', 'value', 'containObject', 'x', 'id' , 'hasCdn'],
   components: {
     noRefFunc,
+    circles,
     condition,
     judge,
     assist,
-    order,
-    circles
+    order
   },
   data() {
     return {
@@ -106,25 +119,25 @@ export default {
     }
   },
   mounted() {
+    console.log(circles);
     if (this.model) {
       createModelMixin(this)
     } else {
-      eventMixin(this);
-      initMixin(this);
       componentListMixin(this.containObject);
       setTimeout(() => {
         this.$data.contain = this.containObject;
-        // console.log(this.$data.contain);
       }, 0);
+      eventMixin(this);
+      initMixin(this);
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.st0{fill:#57BFC3;}
-.st1{fill:#1B8F8F;}
-.st2{fill:#FFFFFF;}
-.st3{font-family:'MicrosoftYaHei';}
-.st4{font-size:18px;}
+	.st0{fill:#57BFC3;}
+	.st1{fill:#FFFFFF;}
+	.st2{font-family:'MicrosoftYaHei';}
+	.st3{font-size:18px;}
+	.st4{fill:#1B8F8F;}
 </style>

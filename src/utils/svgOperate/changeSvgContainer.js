@@ -5,23 +5,23 @@ import { whileOption, judgeOption } from './options.js';
  * @description 将执行代码块嵌入到循环中。思路是将块先放进目标容器中，然后偏移量transform重新进行设置，
  * 这个设置是通过一次次试验得到的数据，所以光看逻辑并不会看出来，需要引入options文件。
  * @param {g tag} target 想要内嵌的目标
- * @param {*} crashTarget 容器
+ * @param {*} conTarget 容器
+ * @variation currentY: 嵌入到当前容器中块的基础transform的y值。 
+ * @variation currentBash: path的某个数值，这个数值改变这个svg块的长度
  */
-export function nestWhileOperate(target, crashTarget, list, isFake) {
+export function nestWhileOperate(target, conTarget, list, isFake) {
   // 先将节点插入到碰撞的块中
-  let conType = crashTarget.getAttribute('data-type'),
+  let conType = conTarget.getAttribute('data-type'),
       type = target.getAttribute('data-type'),
       id = target.getAttribute('id');
 
-      
-
   if (type == 'condition') {
-    return nestConditionOperate.bind(this)(target, crashTarget, list, isFake);
+    return nestConditionOperate.bind(this)(target, conTarget, list, isFake);
   }
   
   // 先得到之前的循环框的内嵌块的起点currentY和path中的延伸长度起点
-  let currentY = parseInt(crashTarget.getAttribute('data-currentY')),
-      currentBash = parseInt(crashTarget.getAttribute('data-currentBash')),
+  let currentY = parseInt(conTarget.getAttribute('data-currentY')),
+      currentBash = parseInt(conTarget.getAttribute('data-currentBash')),
       nextY, nextBash,
       targetInfo = target.getBBox(),
       height = targetInfo.height;
@@ -34,11 +34,12 @@ export function nestWhileOperate(target, crashTarget, list, isFake) {
     }
   }
 
+  // 判断是否是推荐那边进行调用这个函数
   if (!isFake) {
-    toContainer.bind(this)(target, crashTarget, list, list[conType]);
+    toContainer.bind(this)(target, conTarget, list, list[conType]);
   }
   
-
+  // 因为svg图的改变，要改变d中的某个数值，这个数值就是nextBash！
   if (currentBash == whileOption.firstBash) {
     // 第一次的时候，因为会有空隙，所以while循环块的扩大会比目标的height还要大出12
     nextBash = height + whileOption.pathBash;  // 这个12是通过试验得出的。
@@ -47,15 +48,16 @@ export function nestWhileOperate(target, crashTarget, list, isFake) {
     nextBash = height + currentBash;
   }
 
-  nextY = currentY + height;  // 下个内嵌进来的元素的transform的基础值
+  nextY = currentY + height;  // 下个内嵌进来的元素的transform的基础值！
 
-  crashTarget.setAttribute('data-currentY', nextY);  // 将其设置到碰撞容器中，方便下次进行获取
-  crashTarget.setAttribute('data-currentBash', nextBash);
+  conTarget.setAttribute('data-currentY', nextY);  // 将其设置到碰撞容器中，方便下次进行获取
+  conTarget.setAttribute('data-currentBash', nextBash);
   let nextD = whileOption.firstHalf + ' ' + nextBash + ' ' + whileOption.lastHalf; // 设置为path的值
-  crashTarget.getElementsByClassName('out-line')[0].setAttribute('d', nextD); // 赋值path值
+  conTarget.getElementsByClassName('out-line')[0].setAttribute('d', nextD); // 赋值path值
 
+  // 返回一个对象，这里可以删了，但是如果后期把以上数据存入到列表中，要返回这两个对象
   return {
-    target: crashTarget.getAttribute('id'),
+    target: conTarget.getAttribute('id'),
     nextD
   };
 }
@@ -63,30 +65,30 @@ export function nestWhileOperate(target, crashTarget, list, isFake) {
 /**
  * @description 嵌套判断语句时候的函数
  * @param {*} target 
- * @param {*} crashTarget 
+ * @param {*} conTarget 
  * @param {*} list 
  * @param {*} isIf 
  */
-export function nestJudgeOperate(target, crashTarget, list,isIf) {
-  let conID = crashTarget.getAttribute('id'),
-      conType = crashTarget.getAttribute('data-type'),
+export function nestJudgeOperate(target, conTarget, list,isIf) {
+  let conID = conTarget.getAttribute('id'),
+      conType = conTarget.getAttribute('data-type'),
       type = target.getAttribute('data-type'),
       id = target.getAttribute('id');
   
   // 首先将元素内嵌
-  // toContainer(target, crashTarget);
+  // toContainer(target, conTarget);
 
   if (type == 'condition') {
-    return nestConditionOperate.bind(this)(target, crashTarget, list, isFake);
+    return nestConditionOperate.bind(this)(target, conTarget, list, isFake);
   }
 
   // 获得之前的所有数据
-  let currentY = parseInt(crashTarget.getAttribute('data-currentY')),
-      currentSecondY = parseInt(crashTarget.getAttribute('data-currentSecondY')),
-      firstBash = parseInt(crashTarget.getAttribute('data-firstBash')),
-      secondBash = parseInt(crashTarget.getAttribute('data-secondBash')),
-      textBash = parseInt(crashTarget.getAttribute('data-textBash')),
-      firstTime = parseInt(crashTarget.getAttribute('data-firstTime')),
+  let currentY = parseInt(conTarget.getAttribute('data-currentY')),
+      currentSecondY = parseInt(conTarget.getAttribute('data-currentSecondY')),
+      firstBash = parseInt(conTarget.getAttribute('data-firstBash')),
+      secondBash = parseInt(conTarget.getAttribute('data-secondBash')),
+      textBash = parseInt(conTarget.getAttribute('data-textBash')),
+      firstTime = parseInt(conTarget.getAttribute('data-firstTime')),
       targetInfo = target.getBBox(),
       height = targetInfo.height,
       nextY, nextFirstBash, nextSecondBash, nextTextBash,
@@ -125,16 +127,16 @@ export function nestJudgeOperate(target, crashTarget, list,isIf) {
       }
     }
 
-    crashTarget.getElementsByClassName('out-line')[0].setAttribute('d', nextD); // 赋值path值
-    crashTarget.getElementsByClassName('else')[0].setAttribute('transform', nextText); // 赋值文本transform
-    crashTarget.setAttribute('data-firstTime', '2');
+    conTarget.getElementsByClassName('out-line')[0].setAttribute('d', nextD); // 赋值path值
+    conTarget.getElementsByClassName('else')[0].setAttribute('transform', nextText); // 赋值文本transform
+    conTarget.setAttribute('data-firstTime', '2');
 
     nextY = currentY + height;
 
-    crashTarget.setAttribute('data-currentY', nextY);  // 将其设置到碰撞容器中，方便下次进行获取
-    crashTarget.setAttribute('data-firstBash', nextFirstBash);  // 将其设置到碰撞容器中，方便下次进行获取
-    crashTarget.setAttribute('data-textBash', nextTextBash);  // 将其设置到碰撞容器中，方便下次进行获取
-    crashTarget.setAttribute('data-currentSecondY', nextSecondY);
+    conTarget.setAttribute('data-currentY', nextY);  // 将其设置到碰撞容器中，方便下次进行获取
+    conTarget.setAttribute('data-firstBash', nextFirstBash);  // 将其设置到碰撞容器中，方便下次进行获取
+    conTarget.setAttribute('data-textBash', nextTextBash);  // 将其设置到碰撞容器中，方便下次进行获取
+    conTarget.setAttribute('data-currentSecondY', nextSecondY);
   } else {
     if (secondBash == judgeOption.secondBash) {
       nextSecondBash = secondBash - height + 23.5;
@@ -159,28 +161,28 @@ export function nestJudgeOperate(target, crashTarget, list,isIf) {
       }
     }
 
-    crashTarget.getElementsByClassName('out-line')[0].setAttribute('d', nextD); // 赋值path值
+    conTarget.getElementsByClassName('out-line')[0].setAttribute('d', nextD); // 赋值path值
 
     // 下面是设置
     nextY = currentSecondY + height;
-    crashTarget.setAttribute('data-currentSecondY', nextY);  // 将其设置到碰撞容器中，方便下次进行获取
-    crashTarget.setAttribute('data-secondBash', nextSecondBash);  // 将其设置到碰撞容器中，方便下次进行获取
-    crashTarget.setAttribute('data-firstBash', nextFirstBash);  // 将其设置到碰撞容器中，方便下次进行获取
+    conTarget.setAttribute('data-currentSecondY', nextY);  // 将其设置到碰撞容器中，方便下次进行获取
+    conTarget.setAttribute('data-secondBash', nextSecondBash);  // 将其设置到碰撞容器中，方便下次进行获取
+    conTarget.setAttribute('data-firstBash', nextFirstBash);  // 将其设置到碰撞容器中，方便下次进行获取
   }
   // 内嵌块重新设置偏移量
   // target.setAttribute('transform', transform);
-  toContainer.bind(this)(target, crashTarget, list, list[conType]);
+  toContainer.bind(this)(target, conTarget, list, list[conType]);
 
 }
 
 
-function nestConditionOperate(target, crashTarget, list, isFake) {
-  // let extendLine = crashTarget.getElementsByClassName('extend-line')[0],
-  //     poly = crashTarget.getElementsByClassName('poly')[0];
-  let conType = crashTarget.getAttribute('data-type'),
+function nestConditionOperate(target, conTarget, list, isFake) {
+  // let extendLine = conTarget.getElementsByClassName('extend-line')[0],
+  //     poly = conTarget.getElementsByClassName('poly')[0];
+  let conType = conTarget.getAttribute('data-type'),
       type = target.getAttribute('data-type'),
       id = target.getAttribute('id'),
-      conID = crashTarget.getAttribute('id');
+      conID = conTarget.getAttribute('id');
   // extendLine.style.display = 'block';
   // poly.style.display = 'none';
   // let type = target.getAttribute('data-type');
@@ -200,6 +202,29 @@ function nestConditionOperate(target, crashTarget, list, isFake) {
   }
 
   if (!isFake) {
-    toContainer.bind(this)(target, crashTarget, list, list[conType]);
+    toContainer.bind(this)(target, conTarget, list, list[conType]);
   }
+}
+
+export function splitWhileOperate(target, conTarget) {
+  let currentY = conTarget.getAttribute('data-currentY'),
+      targetInfo = target.getBBox(),
+      targetHeight = targetInfo.height,
+      currentBash = conTarget.getAttribute('data-currentBash'),
+      nextY, nextBash;
+
+  nextBash = currentBash - targetHeight;
+
+  if (nextBash <= whileOption.firstBash) {
+    nextBash = whileOption.firstBash;
+  }
+
+  nextY = currentY - targetHeight;
+
+  conTarget.setAttribute('data-currentY', nextY);
+  conTarget.setAttribute('data-currentBash', nextBash);
+
+  let nextD = whileOption.firstHalf + ' ' + nextBash + ' ' + whileOption.lastHalf;  // 设置path值
+  conTarget.getElementsByTagName('g')[0].setAttribute('d', nextD);
+
 }

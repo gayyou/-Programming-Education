@@ -23,7 +23,7 @@ export function listPush(list, type, item) {
     // 如果是判断语句或者选择语句，需要特殊照顾
     item.contain = [];
     item.hasCdn = false;
-    // console.log(item)
+    
     list[type].push(item);
   } else {
     list[type].push(item)

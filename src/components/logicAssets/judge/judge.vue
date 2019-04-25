@@ -24,7 +24,6 @@
       </g>
     </g>
     <noRefFunc
-      v-if="containObject || model"
       v-for="item in $data.contain.noRefFunc"
       :key="item.id"
       :y="item.y"
@@ -33,7 +32,6 @@
       :value="item.value"
     ></noRefFunc>
     <circles
-      v-if="containObject || model"
       v-for="item in $data.contain.circle"
       :key="item.id"
       :containObject="item.contain"
@@ -44,7 +42,6 @@
       :hasCdn="item.hasCdn"
     ></circles>
     <judge
-      v-if="containObject || model"
       v-for="item in $data.contain.judge"
       :key="item.id"
       :containObject="item.contain"
@@ -55,7 +52,6 @@
       :hasCdn="item.hasCdn"
     ></judge>
     <assist
-      v-if="containObject || model"
       v-for="item in $data.contain.assist"
       :key="item.id"
       :y="item.y"
@@ -64,7 +60,7 @@
       :value="item.value"
     ></assist>
     <condition
-      v-if="containObject || model"
+      
       v-for="item in $data.contain.condition"
       :key="item.id"
       :y="item.y"
@@ -73,7 +69,6 @@
       :value="item.value"
     ></condition>
     <order
-      v-if="containObject || model"
       v-for="item in $data.contain.order"
       :key="item.id"
       :y="item.y"
@@ -95,8 +90,8 @@ import { eventMixin, initMixin, createModelMixin } from '../../../utils/mixin.js
 import { componentListMixin } from '../../../utils/shared/model.js'
 import noRefFunc from '../noRefFunc/noRefFunc.vue'
 import condition from '../condition/condition.vue'
-import judge from '../judge/judge.vue'
-import circles from '../circle/circle.vue'
+import judge from '../judge/judgeCpy.vue'
+import circles from '../circle/circleCpy.vue'
 import assist from '../assist/assist.vue'
 import order from '../order/order.vue'
 

@@ -18,8 +18,12 @@
 </template>
 
 <script>
+import noRefFunc from '../noRefFunc/noRefFunc.vue';
 import { eventMixin, initMixin, createModelMixin } from '../../../utils/mixin.js'
 export default {
+  components: {
+    noRefFunc
+  },
   props: ['model', 'value', 'y', 'x', 'id'],
   mounted() {
     if (this.model) {

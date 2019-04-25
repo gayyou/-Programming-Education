@@ -17,11 +17,6 @@ export function eventMixin(that) {
  * @param {DOM} el 组件的
  */
 export function initMixin(that) {
-  // let target = that.$el;
-
-  // 为这个组件设置id，先自增
-  // target.setAttribute('id', 'el' + that.$store.state.elCount);
-  // that.$store.state.elCount++;
 }
 
 export function createModelMixin(that) {

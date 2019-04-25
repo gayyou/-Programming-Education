@@ -69,6 +69,11 @@
       :value="item.value"
     ></order>
     <div v-if="$store.state.isRenew"></div>
+    <!-- <noRefFunc
+      :model="false"
+      :y="120"
+      :value="'123'"
+    ></noRefFunc>-->
   </g>
 </template>
 
@@ -77,8 +82,8 @@ import { eventMixin, initMixin, createModelMixin } from '../../../utils/mixin.js
 import { componentListMixin } from '../../../utils/shared/model.js'
 import noRefFunc from '../noRefFunc/noRefFunc.vue'
 import condition from '../condition/condition.vue'
-import judge from '../judge/judge.vue'
-import circles from './circleCpy.vue'
+import judge from '../judge/judgeCpy.vue'
+import circles from './circle.vue'
 import assist from '../assist/assist.vue'
 import order from '../order/order.vue'
 

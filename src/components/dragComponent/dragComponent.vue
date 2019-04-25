@@ -215,14 +215,14 @@
         :model="true"
         :y="40"
         :x="20"
-        :value="''"
+        :value="'循环'"
         :containObject="{}"
       ></circles>
       <judge
         :model="true"
         :y="160"
         :x="20"
-        :value="''"
+        :value="'判断'"
         :containObject="{}"
       ></judge>
       <circles
@@ -399,9 +399,6 @@ export default {
   },
   mounted() {
     componentListMixin(this.$store.state.canvasList);
-    setTimeout(() => {
-      console.log(this.$store.state.canvasList);
-    }, 0);
   },
   methods: {
     dragStart(event) {
@@ -459,7 +456,7 @@ export default {
         }
         
         renewList(this.$store.state.canvasList, target);
-
+        console.log(this.$store.state.canvasList);
         // 更新列表
         
         this.$store.state.moveTarget = null;
