@@ -34,7 +34,7 @@ export default {
   props: ['value', 'model', 'y', 'x', 'id'],
   mounted() {
     if (this.model) {
-      createModelMixin(this)
+      createModelMixin.call(this)
     } else {
       eventMixin(this);
     }

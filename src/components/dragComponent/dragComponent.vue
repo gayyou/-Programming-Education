@@ -373,9 +373,11 @@ import noRefFunc from '../logicAssets/noRefFunc/noRefFunc.vue'
 import assist from '../logicAssets/assist/assist.vue'
 import Vue from 'vue';
 import { isCrash } from '../../utils/svgOperate/checkCrash.js'
-import { renewList, findList } from '../../utils/listUtils.js'
-import { nestOperate, spiltOperate } from '../../utils/svgOperate/drag.js'
-import { componentListMixin } from '../../utils/shared/model.js'
+import { renewList, findList, componentListMixin } from '../../utils/listUtils.js'
+import { nestOperate, spiltOperate, deleteOperate } from '../../utils/svgOperate/drag.js'
+import { getTransform, getTypeAndID } from '../../utils/shared/utils.js'
+import { adjustOperate } from '../../utils/svgOperate/drag.js'
+import { isSvgContainer } from '../../utils/shared/typeCheck.js'
 
 export default {
   components: {
@@ -426,42 +428,77 @@ export default {
       }
     },
     dragEnd(event) {
+      let mousePayload = {
+        x: event.clientX,
+        y: event.clientY
+      }
       if (this.$store.state.moveTarget) {
-        
         let target = this.$store.state.moveTarget;
         let clickList = findList(target, this.$store.state.canvasList);
-        let type = target.getAttribute('data-type');
-        let result = isCrash(target, this.$store.state.canvasList);
         
-        if (result) {
-          let targetList = findList(target, this.$store.state.canvasList);
-
-          if (targetList == this.$store.state.canvasList) {
-            // 如果得到target是基础的list，那么得到是在嵌合
-            nestOperate.call(this, target, result, this.$store.state.canvasList);
-          } else {
-            
-          }
-          // target指向容器，重新渲染容器的宽高
-          target = result.container;
-        } else {
-          let targetList = findList(target, this.$store.state.canvasList);
-
-          if (targetList !== this.$store.state.canvasList) {
-            let conTarget = $(target).parent()[0];
-            spiltOperate.call(this, target, conTarget, targetList, this.$store.state.canvasList)
-            target = conTarget; // 只需要修改conTarget的值
-          }
-          
+        let bashX = 0, bashY = 0, tempTar = target, isNest = false;
+        let { x: preX, y: preY } = getTransform(target), crashPayload = null;
+        // 当发现这个点击的块并不是canvasList最外层的内容的时候，必须得到它的在最外部的坐标
+        while(clickList !== this.$store.state.canvasList) {
+          isNest = true;
+          let { x, y } = getTransform(tempTar);
+          bashX += x;
+          bashY += y;
+          tempTar = $(tempTar).parent()[0];
+          clickList = findList(tempTar, this.$store.state.canvasList);
         }
-        
+
+        if (!deleteOperate(target, clickList)) {
+          if (isNest) {
+            // 拖拽块是嵌入的操作，拖出去的时候先定位
+            crashPayload = this.$store.state.containInfo;  // 嵌入后拖出来的时候，这个containInfo的作用是记住拖出来的时候容器的大小宽度
+            target.setAttribute('transfrom', 'translate(' + bashX + ',' + bashY + ')');
+          }
+
+          let { type } = getTypeAndID(target);
+          let result = isCrash(target, this.$store.state.canvasList, crashPayload);
+          
+          if (result && isSvgContainer(result.container)) {
+            // result有东西，说明是发生了碰撞
+            // 寻找target所在的列表
+            let targetList = findList(target, this.$store.state.canvasList);
+
+            // 如果这个列表是canvasList的话，说明还没有嵌入这个块中
+            if (targetList == this.$store.state.canvasList) {
+              nestOperate.call(this, target, result, targetList, this.$store.state.canvasList);
+            } else {
+              //进行调整恢复到原来的位置
+              adjustOperate.call(this, target, result.container, targetList);
+            }
+
+            // target指向容器，重新渲染容器的宽高
+            target = result.container;
+          } else {
+            let targetList = findList(target, this.$store.state.canvasList);
+
+            // 没有发生碰撞，并且当这个拖拽的块并不是在基础List中的时候
+            if (targetList !== this.$store.state.canvasList) {
+              let conTarget = $(target).parent()[0];
+              spiltOperate.call(this, target, conTarget, targetList, this.$store.state.canvasList, mousePayload)
+              
+              setTimeout(() => {
+                renewList(this.$store.state.canvasList, conTarget);  // 容器也要修改大小
+              }, 0);
+            }
+          }
+        }
         renewList(this.$store.state.canvasList, target);
-        console.log(this.$store.state.canvasList);
-        // 更新列表
         
+        setTimeout(() => {
+          this.$store.state.isRenew = !this.$store.state.isRenew;
+          console.log(this.$store.state.canvasList)
+        })
+        // 更新列表
+        this.$store.state.containInfo.isUsed = true;
         this.$store.state.moveTarget = null;
       }
       if (this.$store.state.fakeTarget) {
+        this.$store.state.fakeTarget.setAttribute('transform', 'translate(-500, -500)');
         this.$store.state.fakeTarget = null;
       }
     },

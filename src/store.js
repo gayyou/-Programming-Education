@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+
     isStart: true,
     isRenew: false,
     point: '',
@@ -27,6 +28,18 @@ export default new Vuex.Store({
       type: null,
       value: null
     },
+    // 下面是存储拖拽时候，外壳的大小
+
+    containInfo: {
+      width: 0,
+      height: 0,
+      id: null,
+      isUsed: true,
+      x: 0,
+      y: 0
+    },
+
+    // 分割线
     bashX: 0,
     bashY: 0,
     mouse: {

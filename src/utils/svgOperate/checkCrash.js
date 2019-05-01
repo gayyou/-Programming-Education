@@ -1,18 +1,20 @@
 import { svgComponentOption } from '../shared/model.js'
+import { getTransform, getTypeAndID, getSvgWH } from '../shared/utils.js'
+
 /**
  * @description 判断是否碰撞了，返回碰撞的一个对象，对象的内容有 碰撞对象、碰撞部分
  * @param {*} target 
  * @param {*} list 
  * @returns { container, dirX, dirY } container为容器，dirX有两个值 1 为左边，2为右边,dirY有两个值，1为上方，2为下方
  */
-export function isCrash(target, list) {
+export function isCrash(target, list, payload) {
   let resData = null;
 
   svgComponentOption.forEach((value) => {
     if (list[value].length == 0) {
       return ;
     }
-    let tempData = checkCrash(target, list[value]);
+    let tempData = checkCrash(target, list[value], payload);
     if (tempData) {
       resData = tempData;
     }
@@ -21,19 +23,23 @@ export function isCrash(target, list) {
   return resData;
 }
 
-function checkCrash(target, list) {
-  let targetTrans = target.getAttribute('transform'),
-      targetX = parseInt(targetTrans.split('(')[1].split(',')[0]),
-      targetY = parseInt(targetTrans.split(',')[1].split(')')[0]),
-      targetID = target.getAttribute('id'),
-      targetInfo = target.getBBox(),
-      targetWidth = targetInfo.width,
-      targetHeight = targetInfo.height;
+/**
+ * @description 检测是否发生碰撞
+ * @param {*} target 检测的目标
+ * @param {*} list 检测的列表
+ */
+function checkCrash(target, list, payload) {
+  let { x: targetX, y: targetY } = getTransform(target),
+      { id: targetID } = getTypeAndID(target),
+      { width: targetWidth, height: targetHeight } = getSvgWH(target);
+      
   let tempX, tempY, tempW, tempH, tempID;
   let xFlag, yFlag, instanX, instanY, resDirX = 0, resDirY = 0, resData = null;
 
-  // console.log('目标的id为' + targetID);
-  // console.log(list);
+  if (payload && payload.isUsed == false) {
+    targetX += payload.x;
+    targetY += payload.y;
+  }
 
   for (let i = 0; i < list.length; i++) {
     xFlag = 0;
@@ -44,11 +50,13 @@ function checkCrash(target, list) {
     tempH = list[i].height;
     tempID = list[i].id;
 
-    // console.log(tempID)
+    if (payload && tempID == payload.id && payload.isUsed == false) {
+      tempW = payload.width;
+      tempH = payload.height;
+      payload.isUsed = true;
+    }
 
-    // 如果是本身，跳过
     if (tempID == targetID) {
-      // console.log('跳过了')
       continue;
     }
 
@@ -84,7 +92,6 @@ function checkCrash(target, list) {
 
     if (xFlag === 1 && yFlag === 1) {
       // 发生碰撞了
-      // return $('#' + tempID)[0];
       let xAxle1 = targetX + (targetWidth / 2),
           yAxle1 = targetY + (targetHeight / 2),
           xAxle2 = tempX + (tempW / 2),

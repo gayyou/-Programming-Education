@@ -87,7 +87,7 @@
 
 <script>
 import { eventMixin, initMixin, createModelMixin } from '../../../utils/mixin.js'
-import { componentListMixin } from '../../../utils/shared/model.js'
+import { componentListMixin } from '../../../utils/listUtils.js'
 import noRefFunc from '../noRefFunc/noRefFunc.vue'
 import condition from '../condition/condition.vue'
 import judge from '../judge/judge.vue'
@@ -119,16 +119,15 @@ export default {
     }
   },
   mounted() {
-    console.log(circles);
     if (this.model) {
-      createModelMixin(this)
+      createModelMixin.call(this)
     } else {
       componentListMixin(this.containObject);
       setTimeout(() => {
         this.$data.contain = this.containObject;
       }, 0);
       eventMixin(this);
-      initMixin(this);
+      initMixin.call(this);
     }
   }
 }

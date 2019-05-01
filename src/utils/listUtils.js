@@ -1,5 +1,6 @@
-import { svgComponentOption, componentListMixin } from './shared/model.js'
+import { svgComponentOption } from './shared/model.js'
 import { isUndef } from './shared/typeCheck.js'
+import { getTransform, getSvgWH, getTypeAndID } from './shared/utils'
 
 /**
  * @description 拖拽完毕后，将列表中的目标元素进行更新，这里的操作只是对target进行更新，不涉及节点的移动。
@@ -8,13 +9,9 @@ import { isUndef } from './shared/typeCheck.js'
  * @param {Dom} target dom节点
  */
 export function renewList(list, target) {
-  let ID = target.getAttribute('id'),
-      targetTrans = target.getAttribute('transform'),
-      targetX = parseInt(targetTrans.split('(')[1].split(',')[0]),
-      targetY = parseInt(targetTrans.split(',')[1].split(')')[0]),
-      targetInfo = target.getBBox(),
-      width = targetInfo.width,
-      height = targetInfo.height,
+  let { id: ID } = getTypeAndID(target),
+      { x: targetX, y: targetY } = getTransform(target),
+      { width, height } = getSvgWH(target),
       isFind = false;  // 标识符，标志说否找到目标节点
   
     svgComponentOption.forEach((value) => {
@@ -36,9 +33,9 @@ export function renewList(list, target) {
 }
 
 /**
- * @description 进行列表的克隆
- * @param {*} tarList 
- * @param {*} list 
+ * @description 进行列表的克隆,仅仅是克隆circle或者judge里面的块，并不会对circle这个目标进行克隆，所以需要创建这个目标，并且用这个目标的contain属性来进行克隆
+ * @param {*} tarList 被克隆的目标,传入的是容器的contain属性
+ * @param {*} list 新的目标，传入的是容器的contain属性
  */
 export function cloneList(tarList, list) {
   // 先清空或者初始化
@@ -61,6 +58,7 @@ export function cloneList(tarList, list) {
           }
         }
       } else {
+        console.log('targetList', tarList)
         for (let i = 0; i < tarList[value].length; i++) {
           // 用JSON对对象进行深复制
           list[value].push(
@@ -119,14 +117,18 @@ export function findList(target, listObj) {
   return result;
 }
 
+/**
+ * @description 寻找目标是否在列表中
+ * @param {*} target 
+ * @param {*} TarListObj 
+ */
 export function findTypeList (target, TarListObj) {
   // 寻找目标的列表
   if (isUndef(TarListObj)) {
     return false;
   }
 
-  let id = target.getAttribute('id'),
-      type = target.getAttribute('data-type');
+  let { id, type } = getTypeAndID(target);
 
   if (TarListObj[type].length === 0) {
     return ;
@@ -140,3 +142,22 @@ export function findTypeList (target, TarListObj) {
 
   return false;
 }
+
+export function componentListMixin(conObj) {
+  svgComponentOption.forEach((value) => {
+    conObj[value] = [];
+  });
+}
+
+export function listPush(list, type, item) {
+  if (type == 'circle' || type == 'judge') {
+    // 如果是判断语句或者选择语句，需要特殊照顾
+    item.contain = [];
+    item.hasCdn = false;
+    list[type].push(item);
+  } else {
+    list[type].push(item)
+  }
+  this.$store.state.isRenew = !this.$store.state.isRenew;
+}
+

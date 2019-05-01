@@ -23,10 +23,9 @@ export default {
   props: ['model', 'value', 'y', 'x', 'id'],
   mounted() {
     if (this.model) {
-      createModelMixin(this)
+      createModelMixin.call(this)
     } else {
       eventMixin(this);
-      // initMixin(this);
     }
   }
 }

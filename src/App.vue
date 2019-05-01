@@ -10,20 +10,9 @@
         class="index"
         :style="$store.state.isCode ? 'z-index: 1' : 'z-index: 0'"
       ></index>
-      <!-- <router-view>
-        <left-list class="left-list"></left-list>
-        <svg-canvas class="svg-canvas"></svg-canvas>
-      </router-view> -->
-      <!-- <router-view>
-        <recommand></recommand>
-      </router-view> -->
-      <!-- <router-view/> -->
     </div>
     <float-layer></float-layer>
     <loading></loading>
-    <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
-    <!-- <drag></drag> -->
-    <!-- <tests></tests> -->
   </div>
 </template>
 

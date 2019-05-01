@@ -18,6 +18,7 @@ export const judgeOption = {
   // 第一个和第二个不用多说，就是嵌入块的基础坐标
   bashX: 24,
   bashY: 48,
+  bashSecondY: 120,
   // 这个是内嵌进else的时候需要改变的对象，主要改变的是最后一个。
   elseText: {
     firstHalf: 'matrix(1 0 0 1 24.3335 ',

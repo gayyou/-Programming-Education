@@ -12,22 +12,7 @@ export const svgComponentOption = [
   'judge',
 ]
 
-export function componentListMixin(conObj) {
-  svgComponentOption.forEach((value) => {
-    conObj[value] = [];
-  })
-}
-
-export function listPush(list, type, item) {
-  if (type == 'circle' || type == 'judge') {
-    // 如果是判断语句或者选择语句，需要特殊照顾
-    item.contain = [];
-    item.hasCdn = false;
-    
-    list[type].push(item);
-  } else {
-    list[type].push(item)
-  }
-  this.$store.state.isRenew = !this.$store.state.isRenew;
-}
-
+export const svgContainer = [
+  'judge',
+  'circle'
+]
