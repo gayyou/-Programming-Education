@@ -2,10 +2,11 @@ import { nestWhileOperate, nestJudgeOperate, splitWhileOperate, splitJudgeOperat
 import { getTransform, getTypeAndID, setTransform, getPathAttr, setPathAttr, cloneSvgInfo } from '../shared/utils'
 import { whileOption, judgeOption } from './options'
 import { adjustSvgPosi, toContainer } from './domOperate'
-import { cloneList, findList } from '../listUtils'
+import { cloneList, findList, deleteFromList } from '../shared/listUtils'
+import { svgComponentOption } from '../shared/model.js'
 
 /**
- * 
+ * @description 合并操作
  * @param {*} target 
  * @param {*} crashTarget 
  * @param {*} list 
@@ -62,10 +63,11 @@ export function nestOperate(target, crashResult, fromList, conPlaceList) {
 }
 
 /**
- * @param 
- * @param {*} target 
- * @param {*} fromList 
- * @param {*} toList 
+ * @description 进行分离操作
+ * @param {*} target 拖拽的目标，这个是在进行拖拽的时候
+ * @param {*} conTarget 分离的容器目标
+ * @param {*} fromList target所在列表
+ * @param {*} toList 容器所在列表
  */
 export function spiltOperate(target, conTarget, fromList, toList, mousePayload) {
   let { id: id, type: type } = getTypeAndID(target),
@@ -140,9 +142,9 @@ export function spiltOperate(target, conTarget, fromList, toList, mousePayload) 
 
 /**
  * @description 调整操作
- * @param {*} target 
- * @param {*} conTarget 
- * @param {*} conList 
+ * @param {*} target 正在移动的目标
+ * @param {*} conTarget 容器目标
+ * @param {*} conList 容器所在的contain属性列表
  */
 export function adjustOperate(target, conTarget, conList) {
   let { type: conType } = getTypeAndID(conTarget);
@@ -161,21 +163,11 @@ export function adjustOperate(target, conTarget, conList) {
 }
 
 /**
- * @description 删除节点
- * @param {*} target 
- * @param {*} list 
+ * @description 在最外层的容器中进行删除偏左的块
+ * @param {List} list 列表
  */
-export function deleteOperate(target, list) {
-  let { x } = getTransform(target),
-      { id, type } = getTypeAndID(target);
-  let conList = findList(target, list);
-  if (x < 290) {
-    for (let i = 0; i < conList[type].length; i++) {
-      if (id == conList[type][i].id) {
-        conList[type].splice(i, 1);
-        return true;
-      }
-    }
-  }
-  return false;
+export function deleteOperate(list) {
+  svgComponentOption.forEach((value) => {
+    deleteFromList(list[value]);
+  })
 }

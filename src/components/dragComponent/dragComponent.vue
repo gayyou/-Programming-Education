@@ -373,7 +373,7 @@ import noRefFunc from '../logicAssets/noRefFunc/noRefFunc.vue'
 import assist from '../logicAssets/assist/assist.vue'
 import Vue from 'vue';
 import { isCrash } from '../../utils/svgOperate/checkCrash.js'
-import { renewList, findList, componentListMixin } from '../../utils/listUtils.js'
+import { renewList, findList, componentListMixin } from '../../utils/shared/listUtils.js'
 import { nestOperate, spiltOperate, deleteOperate } from '../../utils/svgOperate/drag.js'
 import { getTransform, getTypeAndID } from '../../utils/shared/utils.js'
 import { adjustOperate } from '../../utils/svgOperate/drag.js'
@@ -434,7 +434,10 @@ export default {
       }
       if (this.$store.state.moveTarget) {
         let target = this.$store.state.moveTarget;
-        let clickList = findList(target, this.$store.state.canvasList);
+        let clickList;
+        let conList = clickList = findList(target, this.$store.state.canvasList);
+        let conTarget = $(target).parent()[0]; // 容器
+        let { id: conID, type: conType } = getTypeAndID(conTarget);
         
         let bashX = 0, bashY = 0, tempTar = target, isNest = false;
         let { x: preX, y: preY } = getTransform(target), crashPayload = null;
@@ -448,50 +451,53 @@ export default {
           clickList = findList(tempTar, this.$store.state.canvasList);
         }
 
-        if (!deleteOperate(target, clickList)) {
-          if (isNest) {
-            // 拖拽块是嵌入的操作，拖出去的时候先定位
-            crashPayload = this.$store.state.containInfo;  // 嵌入后拖出来的时候，这个containInfo的作用是记住拖出来的时候容器的大小宽度
-            target.setAttribute('transfrom', 'translate(' + bashX + ',' + bashY + ')');
+        // if (!deleteOperate(target, clickList)) {
+        if (isNest) {
+          // 拖拽块是嵌入的操作，拖出去的时候先定位
+          crashPayload = this.$store.state.containInfo;  // 嵌入后拖出来的时候，这个containInfo的作用是记住拖出来的时候容器的大小宽度
+          target.setAttribute('transfrom', 'translate(' + bashX + ',' + bashY + ')');
+        }
+
+        let { type } = getTypeAndID(target);
+        let result = isCrash(target, this.$store.state.canvasList, crashPayload);
+        
+        if (result && isSvgContainer(result.container)) {
+          // result有东西，说明是发生了碰撞
+          // 寻找target所在的列表
+          let targetList = findList(target, this.$store.state.canvasList);
+
+          // 如果这个列表是canvasList的话，说明还没有嵌入这个块中
+          if (targetList == this.$store.state.canvasList) {
+            nestOperate.call(this, target, result, targetList, this.$store.state.canvasList);
+          } else {
+            //进行调整恢复到原来的位置
+            adjustOperate.call(this, target, result.container, targetList);
           }
 
-          let { type } = getTypeAndID(target);
-          let result = isCrash(target, this.$store.state.canvasList, crashPayload);
-          
-          if (result && isSvgContainer(result.container)) {
-            // result有东西，说明是发生了碰撞
-            // 寻找target所在的列表
-            let targetList = findList(target, this.$store.state.canvasList);
+          // target指向容器，重新渲染容器的宽高
+          target = result.container;
+        } else {
+          let targetList = findList(target, this.$store.state.canvasList);
 
-            // 如果这个列表是canvasList的话，说明还没有嵌入这个块中
-            if (targetList == this.$store.state.canvasList) {
-              nestOperate.call(this, target, result, targetList, this.$store.state.canvasList);
-            } else {
-              //进行调整恢复到原来的位置
-              adjustOperate.call(this, target, result.container, targetList);
-            }
-
-            // target指向容器，重新渲染容器的宽高
-            target = result.container;
-          } else {
-            let targetList = findList(target, this.$store.state.canvasList);
-
-            // 没有发生碰撞，并且当这个拖拽的块并不是在基础List中的时候
-            if (targetList !== this.$store.state.canvasList) {
-              let conTarget = $(target).parent()[0];
-              spiltOperate.call(this, target, conTarget, targetList, this.$store.state.canvasList, mousePayload)
-              
-              setTimeout(() => {
-                renewList(this.$store.state.canvasList, conTarget);  // 容器也要修改大小
-              }, 0);
-            }
+          // 没有发生碰撞，并且当这个拖拽的块并不是在基础List中的时候
+          if (targetList !== this.$store.state.canvasList) {
+            let conTarget = $(target).parent()[0];
+            spiltOperate.call(this, target, conTarget, targetList, this.$store.state.canvasList, mousePayload)
+            
+            setTimeout(() => {
+              renewList(this.$store.state.canvasList, conTarget);  // 容器也要修改大小
+            }, 0);
           }
         }
+        this.$nextTick(() => {
+          // 寻找并进行删除处于左侧的积木块
+          deleteOperate(this.$store.state.canvasList)
+        })
+
         renewList(this.$store.state.canvasList, target);
         
         setTimeout(() => {
           this.$store.state.isRenew = !this.$store.state.isRenew;
-          console.log(this.$store.state.canvasList)
         })
         // 更新列表
         this.$store.state.containInfo.isUsed = true;

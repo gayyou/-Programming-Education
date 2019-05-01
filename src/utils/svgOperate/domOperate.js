@@ -1,5 +1,5 @@
 import { getTypeAndID, getTransform, insertSort, cloneSvgInfo } from '../shared/utils'
-import { cloneList } from '../listUtils.js'
+import { cloneList } from '../shared/listUtils.js'
 import { isSvgContainer } from '../shared/typeCheck.js'
 
 /**
@@ -57,7 +57,7 @@ export function toContainer(target, crashTarget, fromList, toList) {
  */
 export function adjustSvgPosi(target, conList, options, conTarget) {
   let childList = [],
-      { id } = getTypeAndID(target),
+      { id } = getTypeAndID(target), 
       { y } = getTransform(target),
       keys = Object.keys(conList);
   

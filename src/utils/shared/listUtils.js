@@ -1,6 +1,6 @@
-import { svgComponentOption } from './shared/model.js'
-import { isUndef } from './shared/typeCheck.js'
-import { getTransform, getSvgWH, getTypeAndID } from './shared/utils'
+import { svgComponentOption } from './model.js'
+import { isUndef } from './typeCheck.js'
+import { getTransform, getSvgWH, getTypeAndID } from './utils'
 
 /**
  * @description 拖拽完毕后，将列表中的目标元素进行更新，这里的操作只是对target进行更新，不涉及节点的移动。
@@ -58,7 +58,6 @@ export function cloneList(tarList, list) {
           }
         }
       } else {
-        console.log('targetList', tarList)
         for (let i = 0; i < tarList[value].length; i++) {
           // 用JSON对对象进行深复制
           list[value].push(
@@ -79,7 +78,7 @@ export function cloneList(tarList, list) {
  * @description 寻找目标积木块所在的list
  * @returns {List} 返回目标积木块所在的list
  * @param {Dom} target 目标的积木块
- * @param {List} list 整个根目录的list
+ * @param {List} listObj 整个根目录的list
  */
 export function findList(target, listObj) {
   if (isUndef(target)) {
@@ -94,7 +93,7 @@ export function findList(target, listObj) {
   let result = null;
 
   // 查找target是否在这个list对象中
-  result = findTypeList(target, listObj);
+  result = isInList(target, listObj);
   if (result == true) {
     return listObj;
   }
@@ -122,7 +121,7 @@ export function findList(target, listObj) {
  * @param {*} target 
  * @param {*} TarListObj 
  */
-export function findTypeList (target, TarListObj) {
+export function isInList (target, TarListObj) {
   // 寻找目标的列表
   if (isUndef(TarListObj)) {
     return false;
@@ -143,12 +142,22 @@ export function findTypeList (target, TarListObj) {
   return false;
 }
 
+/**
+ * @description 队列表进行插入属性
+ * @param {*} conObj 容器对象
+ */
 export function componentListMixin(conObj) {
   svgComponentOption.forEach((value) => {
     conObj[value] = [];
   });
 }
 
+/**
+ * @description 进行创建节点的时候进行初始化积木块
+ * @param {List} list 想要进行推进的容器
+ * @param {*} type 
+ * @param {*} item 
+ */
 export function listPush(list, type, item) {
   if (type == 'circle' || type == 'judge') {
     // 如果是判断语句或者选择语句，需要特殊照顾
@@ -161,3 +170,14 @@ export function listPush(list, type, item) {
   this.$store.state.isRenew = !this.$store.state.isRenew;
 }
 
+/**
+ * @description 删除节点
+ * @param {*} list 
+ */
+export function deleteFromList(list) {
+  for (let i = 0; i < list.length; i++) {
+    if (list[i].x < 290) {
+      list.splice(i, 1);
+    }
+  }
+}

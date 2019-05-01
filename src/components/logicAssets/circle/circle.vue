@@ -74,7 +74,7 @@
 
 <script>
 import { eventMixin, initMixin, createModelMixin } from '../../../utils/mixin.js'
-import { componentListMixin } from '../../../utils/listUtils.js'
+import { componentListMixin } from '../../../utils/shared/listUtils.js'
 import noRefFunc from '../noRefFunc/noRefFunc.vue'
 import condition from '../condition/condition.vue'
 import judge from '../judge/judge.vue'

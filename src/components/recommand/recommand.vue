@@ -44,7 +44,7 @@
 
 <script>
 import { nestWhileOperate } from '../../utils/svgOperate/changeSvgContainer.js';
-import { cloneList } from '../../utils/listUtils.js';
+import { cloneList } from '../../utils/shared/listUtils.js';
 import PubSub from 'pubsub-js'
 import recList from './recList/recList.vue';
 export default {

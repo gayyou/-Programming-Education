@@ -1,4 +1,16 @@
+import { isUndef } from './typeCheck'
+
+/**
+ * @version 1.0.0
+ * @description 获得target的位置
+ * @param {Dom} target 获得target的位置 
+ * @returns { x, y }
+ */
 export function getTransform(target) {
+  if (isUndef(target)) {
+    return null;
+  }
+
   let transInfo = target.getAttribute('transform'),
       x = parseInt(transInfo.split('(')[1].split(',')[0]),
       y = parseInt(transInfo.split(',')[1].split(')')[0]);
@@ -9,7 +21,15 @@ export function getTransform(target) {
   }
 }
 
+/**
+ * @description 获得svg图块的宽高
+ * @param {Dom} target 目标dom节点
+ */
 export function getSvgWH(target) {
+  if (isUndef(target)) {
+    return null;
+  }
+
   let boxInfo = target.getBBox(),
       width = boxInfo.width,
       height = boxInfo.height;
@@ -20,17 +40,34 @@ export function getSvgWH(target) {
   }
 }
 
+/**
+ * @description 获得目标的类型和ID
+ * @param {Dom} target 目标dom节点
+ */
 export function getTypeAndID(target) {
+  if (isUndef(target)) {
+    return null;
+  }
+
   return {
     id: target.getAttribute('id'),
     type: target.getAttribute('data-type')
   }
 }
 
+/**
+ * 
+ * @param {Dom} target 
+ * @param {x, y} payLoad 传入一个函数，有x值和y值，为这个target设置位置
+ */
 export function setTransform(target, payLoad) {
   target.setAttribute('transform', 'translate(' + payLoad.x + ',' + payLoad.y + ')');
 }
 
+/**
+ * @description 插入升序排序
+ * @param {List} list 排序列表，这个列表是某个容器的所有子节点，需要进行获取
+ */
 export function insertSort(list) {
   let i, j, k;
 
@@ -57,6 +94,11 @@ export function insertSort(list) {
     }
 }
 
+/**
+ * @description 克隆目标信息，target是结果，model是模板
+ * @param {Dom} target 
+ * @param {Dom} model 
+ */
 export function cloneSvgInfo(target, model) {
   let keys = Object.keys(model);
 
@@ -69,6 +111,10 @@ export function cloneSvgInfo(target, model) {
   }
 }
 
+/**
+ * @description 将容器进行嵌套的时候，将原来的容器的属性进行保存并放到新的容器中去的方法
+ * @param {Dom} target 获得路径的所有属性
+ */
 export function getPathAttr(target) {
   let { type } = getTypeAndID(target);
 
@@ -87,7 +133,11 @@ export function getPathAttr(target) {
   return null;
 }
 
-
+/**
+ * @description 进行设置path的属性
+ * @param {*} target 
+ * @param {*} param 
+ */
 export function setPathAttr(target, param) {
   let { type } = getTypeAndID(target);
 
@@ -156,8 +206,6 @@ const pathAttr = {
   },
 
   setJudgeAttr(target, param) {
-    console.log(param.outLine)
-    console.log(param.textBash)
     target.getElementsByClassName('out-line')[0].setAttribute('d', param.outLine);
     target.getElementsByClassName('else')[0].setAttribute('transform', param.textBash);
     target.setAttribute('data-currentY', param.currentY);
@@ -167,4 +215,3 @@ const pathAttr = {
     target.setAttribute('data-currentSecondY', param.currentSecondY);
   }
 }
-

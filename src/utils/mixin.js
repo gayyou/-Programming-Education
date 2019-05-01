@@ -1,6 +1,5 @@
-import { listPush } from './listUtils.js'
+import { listPush, findList } from './shared/listUtils.js'
 import { getTransform, getTypeAndID, getSvgWH } from './shared/utils'
-import { findList } from './listUtils.js'
 
 /**
  * @description 混入模式，将这个可移动的组件添加一个点击事件,点击将全局的拖拽对象moveTarget赋值为这个组件
