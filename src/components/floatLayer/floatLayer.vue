@@ -1,10 +1,11 @@
 <template>
   <div class="float-layer" 
-    v-if="$store.state.showLogin || $store.state.showRegist || $store.state.showConfirm"
+    v-if="$store.state.showLogin || $store.state.showRegist || $store.state.showConfirm || $store.state.showMessage"
   >
-    <login v-if="$store.state.showLogin"></login>
-    <regist v-if="$store.state.showRegist"></regist>
+    <login v-if="$store.state.showLogin" :message="$data.message"></login>
+    <regist v-if="$store.state.showRegist" :message="$data.message"></regist>
     <confirm-layer v-if="$store.state.showConfirm"></confirm-layer>
+    <message v-if="$store.state.showMessage" :message="$data.message"></message>
   </div>  
 </template>
 
@@ -12,11 +13,18 @@
 import login from './login/login.vue'
 import regist from './regist/regist.vue'
 import confirmLayer from "./confirm/confirm.vue";
+import message from './message/message.vue';
 export default {
+  data() {
+    return {
+      message: ''
+    }
+  },
   components: {
     login,
     regist,
-    'confirm-layer': confirmLayer
+    'confirm-layer': confirmLayer,
+    message
   }
 }
 </script>

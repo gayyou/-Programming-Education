@@ -1,20 +1,23 @@
 import { nestWhileOperate, nestJudgeOperate, splitWhileOperate, splitJudgeOperate } from './changeSvgContainer.js'
 import { getTransform, getTypeAndID, setTransform, getPathAttr, setPathAttr, cloneSvgInfo } from '../shared/utils'
 import { whileOption, judgeOption } from './options'
-import { adjustSvgPosi, toContainer } from './domOperate'
-import { cloneList, findList, deleteFromList } from '../shared/listUtils'
+import { adjustSvgPosi, toContainer } from './domOperate.js'
+import { cloneList, findList, deleteFromList, renewList } from '../shared/listUtils'
 import { svgComponentOption } from '../shared/model.js'
 
 /**
- * @description 合并操作
+ * @description 合并操作，需要传入this对象
+ * @version 1.1.0 减少参数List，直接从target和conTarget进行获取list表
  * @param {*} target 
  * @param {*} crashTarget 
  * @param {*} list 
- * @param {*} args 
+ * @param {*} conPlaceList 目标容器的list。并不是其contain属性
  */
-export function nestOperate(target, crashResult, fromList, conPlaceList) {
+export function nestOperate(target, crashResult) {
   let { type: conType, id: conID } = getTypeAndID(crashResult.container);
   let { type } = getTypeAndID(target);
+  let fromList = findList(target, this.$store.state.canvasList);
+  let conPlaceList = findList(crashResult.container, this.$store.state.canvasList);
 
   // 这里是用switch判断容器的类型，从而更改容器的形状
   switch(conType) {
@@ -48,31 +51,37 @@ export function nestOperate(target, crashResult, fromList, conPlaceList) {
     }
   }
 
-  let containParam = null;
+  let containParam = null;  // 这个是复制原来容器的信息，然后在新创建的对象中进行改变
   // 这里是改变列表中的位置
   if (type == 'judge' || type == 'circle' || type == 'condition') {
     containParam = getPathAttr(target);
   }
+  // 上面那些只是很假的可视区域的改变，这里才是对列表进行改变
   toContainer.bind(this)(target, crashResult.container, fromList, conPlaceList[conType]);
   setTimeout(() => {
     if (containParam) {
       let target = $('#' + containParam.id)[0];
       setPathAttr(target, containParam);
     }
+    renewList(this.$store.state.canvasList, crashResult.container);  // 更新碰撞的容器在列表中的大小
   }, 1)
 }
 
 /**
- * @description 进行分离操作
+ * @description 进行分离操作，需要传入this对象
+ * @version 1.1.0 减少参数List，直接从target和conTarget进行获取list表
  * @param {*} target 拖拽的目标，这个是在进行拖拽的时候
- * @param {*} conTarget 分离的容器目标
+ * @param {*} conTarget 分离的目标的容器
  * @param {*} fromList target所在列表
  * @param {*} toList 容器所在列表
+ * @param {*} mousePayLoad 点击事件鼠标的位置
  */
-export function spiltOperate(target, conTarget, fromList, toList, mousePayload) {
+export function spiltOperate(target, conTarget, mousePayload) {
   let { id: id, type: type } = getTypeAndID(target),
       { id: conID, type: conType } = getTypeAndID(conTarget),
-      { x: bashX, y: bashY } = getTransform(conTarget);
+      { x: bashX, y: bashY } = getTransform(conTarget),
+      fromList = findList(target, this.$store.state.canvasList),
+      toList = this.$store.state.canvasList;  // 设置为根的原因就是只有移动到根容器中才会进行分裂
 
   switch(conType) {
     // 更新容器的状态
@@ -89,6 +98,7 @@ export function spiltOperate(target, conTarget, fromList, toList, mousePayload) 
   setTimeout(() => {
     adjustOperate.call(this, target, conTarget, fromList);  // 拖拽出去后进行调整容器
   }, 0)
+
   // 更新拉出来的块
   let mouseDisX = mousePayload.x - this.$store.state.mouse.x,
       mouseDisY = mousePayload.y - this.$store.state.mouse.y;
@@ -102,7 +112,7 @@ export function spiltOperate(target, conTarget, fromList, toList, mousePayload) 
         y: temp.y
       });
 
-      let containParam = null;
+      let containParam = null;  // 如果拉出去的是容器的话，会对新渲染出来的容器进行改变
       // 这里是改变列表中的位置
       if (type == 'judge' || type == 'circle' || type == 'condition') {
         containParam = getPathAttr(target);
@@ -115,39 +125,23 @@ export function spiltOperate(target, conTarget, fromList, toList, mousePayload) 
           let target = $('#' + containParam.id)[0];
           setPathAttr(target, containParam);
         }
-      }, 0)
-      // let temp = fromList[type].splice(i, 1)[0];
-      // let newObj = {
-      //   contain: {}
-      // }
-      // temp.x = bashX + temp.x + mouseDisX;
-      // temp.y = bashY + temp.y + mouseDisY;
-      // cloneSvgInfo(newObj, temp);
-      // cloneList(temp.contain, newObj.contain)
-      // // 对列表进行更新
-      // setTransform(target, {
-      //   x: newObj.x,
-      //   y: newObj.y
-      // })
-
-      // setTimeout(() => {
-      //   adjustOperate.call(this, target, conTarget, fromList);  // 拖拽出去后进行调整容器
-      // }, 0)
-
-      // toList[type].push(newObj);
-      // this.$store.state.isRenew = !this.$store.state.isRenew;
+        renewList(this.$store.state.canvasList, conTarget);  // 更新容器列表
+      }, 1)
     }
   }
 }
 
 /**
- * @description 调整操作
+ * @description 调整操作，需要更改作用域对象为vue对象，方便访问store
+ * @time 2019-05-02
+ * @version 1.1.0 减少参数List，直接从target和conTarget进行获取list表
  * @param {*} target 正在移动的目标
  * @param {*} conTarget 容器目标
  * @param {*} conList 容器所在的contain属性列表
  */
 export function adjustOperate(target, conTarget, conList) {
   let { type: conType } = getTypeAndID(conTarget);
+      // conList = findList(target, this.$store.state.canvasList);
 
   switch(conType) {
     case 'circle': {

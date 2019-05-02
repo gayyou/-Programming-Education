@@ -117,6 +117,24 @@ export function findList(target, listObj) {
 }
 
 /**
+ * @description 找到容器节点对应的list表,返回对应的列表,即列表中该对象的contain属性
+ * @param {Dom} conTarget 
+ * @param {List} list 根列表
+ */
+export function findConCspList(conTarget, list) {
+  let placeList = findList(conTarget, list),
+      { id, type } = getTypeAndID(conTarget);
+  for (let i = 0; i < placeList[type].length; i++) {
+    if (id == placeList[type][i].id) {
+      return placeList[type][i];
+    }
+  }
+  return null;
+}
+
+
+
+/**
  * @description 寻找目标是否在列表中
  * @param {*} target 
  * @param {*} TarListObj 

@@ -8,11 +8,11 @@
     <div class="regist-cutline"></div>
     <div class="regist-account">
       <label for="regist-account"><span>手机号</span></label>
-      <input id="regist-account" type="text">
+      <input id="regist-account" type="text" v-model="$data.account" ref="account">
     </div>
     <div class="regist-password">
       <label for="regist-password"><span>密码</span></label>
-      <input id="regist-password" type="password">
+      <input id="regist-password" type="password" v-model="$data.password" ref="password">
     </div>
     <button class="regist-button" id="regist-button">注册</button>
   </div>
@@ -20,9 +20,83 @@
 
 <script>
 export default {
+  data() {
+    return {
+      account: '',
+      password: '',
+      accIsOK: true,
+      passIsOK: true
+    }
+  },
   methods: {
     closeLayer(event) {
       this.$store.state.showRegist = false;
+    },
+    regist(event) {
+      let accReg = new RegExp(/^1[3456789]\d{9}$/),
+          passReg = new RegExp(/^.{0,15}$/);
+      
+      if (!accReg.test(this.$data.account)) {
+        this.$data.accIsOK = false;
+        this.$refs.account.focus();
+        return ;
+      }
+      if (!passReg.test(this.$data.password)) {
+        this.$data.passIsOK = false;
+        this.$refs.password.focus();
+        return ;
+      }
+
+      this.axios
+      .post('/user/register', {
+        userName: this.$data.account,
+        password: this.$data.password
+      })
+      .then((res) => {
+        res = JSON.parse(res);
+        switch(res.code) {
+          case '200': {
+            if (res.data) {
+              // 登陆成功
+            } else {
+              this.$emit('message', '登陆失败,请检测账号和密码')
+              // 登陆失败
+            }
+            break;
+          }
+          case '500': {
+            this.$emit('message', '请求失败，请检查你的网络状况')
+            break;
+          }
+        }
+      })
+      .catch((err) => {
+        throw new Error(err);
+      })
+    }
+  },
+  watch: {
+    account(newVal) {
+      let reg = new RegExp(/^1[3456789]\d{9}$/);
+      if (reg.test(this.$data.account)) {
+        this.$data.accIsOK = true;
+      } else {
+        this.$data.accIsOK = false;
+      }
+      if (newVal.length > 11) {
+        this.$data.account = newVal.slice(0, 11);
+      }
+    },
+    password(newVal) {
+      let reg = new RegExp(/^.{0,15}$/);
+      if (reg.test(this.$data.password)) {
+        this.$data.passIsOK = true;
+      } else {
+        this.$data.passIsOK = false;
+      }
+      if (newVal.length > 18) {
+        this.$data.password = newVal.slice(0, 18);
+      }
     }
   }
 }

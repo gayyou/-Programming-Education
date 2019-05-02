@@ -61,6 +61,8 @@ export function adjustSvgPosi(target, conList, options, conTarget) {
       { y } = getTransform(target),
       keys = Object.keys(conList);
   
+
+
   // 获得所有子节点
   for (let i = 0; i < keys.length; i++) {
     for (let j = 0; j < conList[keys[i]].length; j++) {

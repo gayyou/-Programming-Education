@@ -7,21 +7,95 @@
     <div class="login-cutline"></div>
     <div class="login-account">
       <label for=""><span>手机号</span></label>
-      <input id="login-account" type="text">
+      <input id="login-account" type="text" v-model="$data.account" ref="account">
     </div>
     <div class="login-password">
       <label for=""><span>密码</span></label>
-      <input id="login-password" type="password">
+      <input id="login-password" type="password" v-model="$data.password" ref="password">
     </div>
-    <button class="login-button" id="login-button">登陆</button>
+    <button class="login-button" id="login-button" @click="login">登陆</button>
   </div>
 </template>
 
 <script>
 export default {
+  props: ['message'],
+  data() {
+    return {
+      account: '',
+      password: '',
+      accIsOK: true,
+      passIsOK: true
+    }
+  },
   methods: {
     closeLayer(event) {
       this.$store.state.showLogin = false;
+    },
+    login(event) {
+      let accReg = new RegExp(/^1[3456789]\d{9}$/),
+          passReg = new RegExp(/^.{0,15}$/);
+      
+      if (!accReg.test(this.$data.account)) {
+        this.$data.accIsOK = false;
+        this.$refs.account.focus();
+        return ;
+      }
+      if (!passReg.test(this.$data.password)) {
+        this.$data.passIsOK = false;
+        this.$refs.password.focus();
+        return ;
+      }
+
+      this.$http.post('/user/login', {
+        userName: this.$data.account,
+        password: this.$data.password
+      })
+      .then((res) => {
+        res = JSON.parse(res);
+        switch(res.code) {
+          case '200': {
+            if (res.data) {
+              // 登陆成功
+            } else {
+              this.$emit('message', '登陆失败,请检测账号和密码')
+              // 登陆失败
+            }
+            break;
+          }
+          case '500': {
+            this.$emit('message', '请求失败，请检查你的网络状况')
+            break;
+          }
+        }
+      })
+      .catch((err) => {
+        throw new Error(err);
+      })
+    }
+  },
+  watch: {
+    account(newVal) {
+      let reg = new RegExp(/^1[3456789]\d{9}$/);
+      if (reg.test(this.$data.account)) {
+        this.$data.accIsOK = true;
+      } else {
+        this.$data.accIsOK = false;
+      }
+      if (newVal.length > 11) {
+        this.$data.account = newVal.slice(0, 11);
+      }
+    },
+    password(newVal) {
+      let reg = new RegExp(/^.{0,15}$/);
+      if (reg.test(this.$data.password)) {
+        this.$data.passIsOK = true;
+      } else {
+        this.$data.passIsOK = false;
+      }
+      if (newVal.length > 18) {
+        this.$data.password = newVal.slice(0, 18);
+      }
     }
   }
 }

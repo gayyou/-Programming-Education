@@ -4,18 +4,17 @@
       <span>提示</span>
     </div>
     <div class="prompt-value">
-      <span>{{ $store.state.confirmMes }}</span>
+      <span>{{ message }}</span>
     </div>
     <div class="prompt-choice">
-      <button class="prompt-cancel" @click="cancelOperate">取消</button>
-      <button class="prompt-confirm" @click="confirmOperate">确定</button>
+      <button class="prompt-confirm" @click="isRead">确定</button>
     </div>
   </div>
 </template>
 
 <script>
-import PubSub from 'pubsub-js'
 export default {
+  props: ['message'],
   data() {
     return {
       isAnimate: false
@@ -27,21 +26,8 @@ export default {
     }, 10);
   },
   methods: {
-    cancelOperate() {
-      this.$store.state.showConfirm = false;
-      this.$data.isAnimate = false;
-      PubSub.publish('checkRecommand', {
-        confirm: false,
-        cancel: true
-      })
-    },
-    confirmOperate() {
-      this.$store.state.showConfirm = false;
-      this.$data.isAnimate = false;
-      PubSub.publish('checkRecommand', {
-        confirm: true,
-        cancel: false
-      })
+    isRead(event) {
+      this.$store.state.showMessage = false;
     }
   },
 }

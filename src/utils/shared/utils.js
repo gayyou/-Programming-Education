@@ -1,4 +1,5 @@
 import { isUndef } from './typeCheck'
+import { findList } from './listUtils'
 
 /**
  * @version 1.0.0
@@ -213,5 +214,30 @@ const pathAttr = {
     target.setAttribute('data-secondBash', param.secondBash);
     target.setAttribute('data-firstTime', param.firstTime);
     target.setAttribute('data-currentSecondY', param.currentSecondY);
+  }
+}
+
+/**
+ * @description 得到一个svg图的实际位置
+ * @param {Dom} target 想要知道的目标
+ * @param {List} rootList 根列表
+ */
+export function getTotalPosi(target, rootList) {
+  let clickList = findList(target, rootList),
+      bashX = 0,
+      bashY = 0;
+
+  while(clickList !== rootList) {
+    let { x, y } = getTransform(target);
+
+    bashX += x;
+    bashY += y;
+    target = $(target).parent()[0];
+    clickList = findList(target, rootList);
+  }
+
+  return {
+    x: bashX,
+    y: bashY
   }
 }

@@ -378,6 +378,7 @@ import { nestOperate, spiltOperate, deleteOperate } from '../../utils/svgOperate
 import { getTransform, getTypeAndID } from '../../utils/shared/utils.js'
 import { adjustOperate } from '../../utils/svgOperate/drag.js'
 import { isSvgContainer } from '../../utils/shared/typeCheck.js'
+import { changeSvgNest, changeSvgPosi } from '../../utils/moveEndUtils.js'
 
 export default {
   components: {
@@ -434,61 +435,88 @@ export default {
       }
       if (this.$store.state.moveTarget) {
         let target = this.$store.state.moveTarget;
-        let clickList;
-        let conList = clickList = findList(target, this.$store.state.canvasList);
-        let conTarget = $(target).parent()[0]; // 容器
-        let { id: conID, type: conType } = getTypeAndID(conTarget);
+        // let clickList;
+        // let conList = clickList = findList(target, this.$store.state.canvasList);
+        // let conTarget = $(target).parent()[0]; // 容器
+        // let { id: conID, type: conType } = getTypeAndID(conTarget);
         
-        let bashX = 0, bashY = 0, tempTar = target, isNest = false;
-        let { x: preX, y: preY } = getTransform(target), crashPayload = null;
-        // 当发现这个点击的块并不是canvasList最外层的内容的时候，必须得到它的在最外部的坐标
-        while(clickList !== this.$store.state.canvasList) {
-          isNest = true;
-          let { x, y } = getTransform(tempTar);
-          bashX += x;
-          bashY += y;
-          tempTar = $(tempTar).parent()[0];
-          clickList = findList(tempTar, this.$store.state.canvasList);
-        }
+        // let bashX = 0, bashY = 0, tempTar = target, isNest = false;
+        // let { x: preX, y: preY } = getTransform(target), crashPayload = null;
+        // // 当发现这个点击的块并不是canvasList最外层的内容的时候，必须得到它的在最外部的坐标
+        // while(clickList !== this.$store.state.canvasList) {
+        //   isNest = true;
+        //   let { x, y } = getTransform(tempTar);
+        //   bashX += x;
+        //   bashY += y;
+        //   tempTar = $(tempTar).parent()[0];
+        //   clickList = findList(tempTar, this.$store.state.canvasList);
+        // }
 
-        // if (!deleteOperate(target, clickList)) {
-        if (isNest) {
-          // 拖拽块是嵌入的操作，拖出去的时候先定位
+        // // if (!deleteOperate(target, clickList)) {
+        // if (isNest) {
+        //   // 拖拽块是嵌入的操作，拖出去的时候先定位
+        //   crashPayload = this.$store.state.containInfo;  // 嵌入后拖出来的时候，这个containInfo的作用是记住拖出来的时候容器的大小宽度
+        //   target.setAttribute('transfrom', 'translate(' + bashX + ',' + bashY + ')');
+        // }
+
+        // let { type } = getTypeAndID(target);
+        // let result = isCrash(target, this.$store.state.canvasList, crashPayload);
+        
+        // if (result && isSvgContainer(result.container)) {
+        //   // result有东西，说明是发生了碰撞
+        //   // 寻找target所在的列表
+        //   let targetList = findList(target, this.$store.state.canvasList);
+
+        //   // 如果这个列表是canvasList的话，说明还没有嵌入这个块中
+        //   if (targetList == this.$store.state.canvasList) {
+        //     nestOperate.call(this, target, result, targetList, this.$store.state.canvasList);
+        //   } else {
+        //     //进行调整恢复到原来的位置
+        //     adjustOperate.call(this, target, result.container, targetList);
+        //   }
+
+        //   // target指向容器，重新渲染容器的宽高
+        //   target = result.container;
+        // } else {
+        //   let targetList = findList(target, this.$store.state.canvasList);
+
+        //   // 没有发生碰撞，并且当这个拖拽的块并不是在基础List中的时候
+        //   if (targetList !== this.$store.state.canvasList) {
+        //     let conTarget = $(target).parent()[0];
+        //     spiltOperate.call(this, target, conTarget, targetList, this.$store.state.canvasList, mousePayload)
+        //     console.log(this.$store.state.canvasList)
+        //     // setTimeout(() => {
+        //     //   renewList(this.$store.state.canvasList, conTarget);  // 容器也要修改大小
+        //     // }, 0);
+        //   }
+        // }
+
+
+        let conList = findList(target, this.$store.state.canvasList),
+            crashPayload = null,
+            { id: conID } = getTypeAndID($(target).parent()[0]);
+
+        if (conList != this.$store.state.canvasList) {
           crashPayload = this.$store.state.containInfo;  // 嵌入后拖出来的时候，这个containInfo的作用是记住拖出来的时候容器的大小宽度
-          target.setAttribute('transfrom', 'translate(' + bashX + ',' + bashY + ')');
         }
 
-        let { type } = getTypeAndID(target);
         let result = isCrash(target, this.$store.state.canvasList, crashPayload);
-        
-        if (result && isSvgContainer(result.container)) {
-          // result有东西，说明是发生了碰撞
-          // 寻找target所在的列表
-          let targetList = findList(target, this.$store.state.canvasList);
+        let toConList = null;
 
-          // 如果这个列表是canvasList的话，说明还没有嵌入这个块中
-          if (targetList == this.$store.state.canvasList) {
-            nestOperate.call(this, target, result, targetList, this.$store.state.canvasList);
-          } else {
-            //进行调整恢复到原来的位置
-            adjustOperate.call(this, target, result.container, targetList);
-          }
-
-          // target指向容器，重新渲染容器的宽高
-          target = result.container;
+        if (result) {
+          toConList = findList(result.container);
         } else {
-          let targetList = findList(target, this.$store.state.canvasList);
-
-          // 没有发生碰撞，并且当这个拖拽的块并不是在基础List中的时候
-          if (targetList !== this.$store.state.canvasList) {
-            let conTarget = $(target).parent()[0];
-            spiltOperate.call(this, target, conTarget, targetList, this.$store.state.canvasList, mousePayload)
-            
-            setTimeout(() => {
-              renewList(this.$store.state.canvasList, conTarget);  // 容器也要修改大小
-            }, 0);
-          }
+          toConList = this.$store.state.canvasList;
         }
+
+        if ((result && result.container.getAttribute('id') != conID && isSvgContainer(result.container)) || toConList != this.$store.state.canvasList) {
+          // 发生碰撞时候 || 没有发生碰撞，移动的时候，将这个积木块拖到最外层的容器中
+          changeSvgNest.call(this, target, result, event);
+        } else {
+          // 没有发生碰撞的时候
+          changeSvgPosi.call(this, target);
+        }
+
         this.$nextTick(() => {
           // 寻找并进行删除处于左侧的积木块
           deleteOperate(this.$store.state.canvasList)

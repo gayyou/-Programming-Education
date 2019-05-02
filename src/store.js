@@ -5,7 +5,6 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-
     isStart: true,
     isRenew: false,
     point: '',
@@ -15,7 +14,8 @@ export default new Vuex.Store({
     showLogin: false,
     showRegist: false,
     showConfirm: false,
-    isLogin: true,
+    showMessage: false,
+    isLogin: false,
     isInput: null,
     isCode: true,
     elCount: 0,
