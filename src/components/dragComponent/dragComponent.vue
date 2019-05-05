@@ -5,7 +5,7 @@
     @mousedown="dragStart"
   >
     <div class="renew" style="display:none" v-if="$store.state.isRenew"></div>
-  
+
     <svg
       xmlns:dc="http://purl.org/dc/elements/1.1/"
       xmlns:cc="http://creativecommons.org/ns#"
@@ -21,19 +21,6 @@
       
       inkscape:version="0.92.3 (2405546, 2018-03-11)"
       sodipodi:docname="绘图.svg">
-      <defs
-        id="defs2">
-        <inkscape:path-effect
-          effect="bspline"
-          id="path-effect18"
-          is_visible="true"
-          weight="33.333333"
-          steps="2"
-          helper_size="0"
-          apply_no_weight="true"
-          apply_with_weight="true"
-          only_selected="false" />
-      </defs>
       <sodipodi:namedview
         id="base"
         pagecolor="#ffffff"
@@ -136,6 +123,7 @@
     <svg xmlns="http://www.w3.org/2000/svg" width="3.66rem" height="100%" id="model-container"
       v-if="$store.state.leftStatus === 1"
     >
+      
       <g transform="translate(12,0)" display="block" id="move-operate">
         <text class="operate-title" x="20" y="20" text-anchor="middle" dominant-baseline="central" dy="0">功能</text>
       </g>
@@ -508,14 +496,30 @@ export default {
         } else {
           toConList = this.$store.state.canvasList;
         }
-
-        if ((result && result.container.getAttribute('id') != conID && isSvgContainer(result.container)) || toConList != this.$store.state.canvasList) {
-          // 发生碰撞时候 || 没有发生碰撞，移动的时候，将这个积木块拖到最外层的容器中
+        // if (result)
+        // console.log(result.container.getAttribute('id') != conID)
+        if (true) {
+          console.log('碰撞了')
+          // console.log('fakeTarget', this.$store.state.fakeTarget);
+          console.log((this.$store.state.fakeTarget && !result && toConList == this.$store.state.canvasList) );
+          console.log((result && result.container.getAttribute('id') != conID && isSvgContainer(result.container)))
+        }
+        if ((!this.$store.state.fakeTarget && !result && toConList == this.$store.state.canvasList && conList != this.$store.state.canvasList) 
+            // 第一段是没有发生碰撞，并且目标容器是根容器，所在容器并不是根容器，而且不是在创建的时候，即就是在分裂的时候
+            // 第二段的是碰撞有结果，并且碰撞对象并不是自己的容器，碰撞结果是一个容器积木块
+            || (result && result.container.getAttribute('id') != conID && isSvgContainer(result.container))) {
+          // 发生了碰撞并且碰撞对象并不是容器
           changeSvgNest.call(this, target, result, event);
-        } else {
-          // 没有发生碰撞的时候
+        } else if (!result || (result.container.getAttribute('id') == conID && isSvgContainer(result.container))) {
           changeSvgPosi.call(this, target);
         }
+        // if ((result && result.container.getAttribute('id') != conID && isSvgContainer(result.container)) || toConList != this.$store.state.canvasList) {
+        //   // 发生碰撞时候 || 没有发生碰撞，移动的时候，将这个积木块拖到最外层的容器中
+        //     changeSvgNest.call(this, target, result, event);
+        // } else {
+        //   // 没有发生碰撞的时候
+        //     changeSvgPosi.call(this, target);
+        // }
 
         this.$nextTick(() => {
           // 寻找并进行删除处于左侧的积木块

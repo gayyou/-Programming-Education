@@ -19,7 +19,7 @@
       <text transform="matrix(1 0 0 1 24.3335 30.3763)" class="st1 st2 st3">如果</text>
       <text transform="matrix(1 0 0 1 24.3335 100.3763)" class="st1 st2 st3 else">否则</text>
       <polygon class="st4" :style="hasCdn ? 'display: none' : 'display: block'" points="106,12.3 82,12.3 70,25.3 82,38.3 106,38.3 118,25.3 	"/>
-      <g transform="translate(170,0)" :style="hasCdn ? 'display: block' : 'display: none'" class="extend-line">
+      <g transform="translate(110,0)" :style="hasCdn ? 'display: block' : 'display: none'" class="extend-line">
         <path class="st0" d="M138,48H12C5.4,48,0,42.6,0,36V12C0,5.4,5.4,0,12,0l126,0c13.3,0,24,10.7,24,24v0C162,37.3,151.3,48,138,48z"	/>
       </g>
     </g>
@@ -31,26 +31,30 @@
       :id="item.id"
       :value="item.value"
     ></noRefFunc>
-    <circles
-      v-for="item in $data.contain.circle"
-      :key="item.id"
-      :containObject="item.contain"
-      :y="item.y"
-      :x="item.x"
-      :id="item.id"
-      :value="item.value"
-      :hasCdn="item.hasCdn"
-    ></circles>
-    <judge
-      v-for="item in $data.contain.judge"
-      :key="item.id"
-      :containObject="item.contain"
-      :y="item.y"
-      :x="item.x"
-      :id="item.id"
-      :value="item.value"
-      :hasCdn="item.hasCdn"
-    ></judge>
+    <template v-if="$data.contain.circle.length != 0">
+      <circles
+        v-for="item in $data.contain.circle"
+        :key="item.id"
+        :containObject="item.contain"
+        :y="item.y"
+        :x="item.x"
+        :id="item.id"
+        :value="item.value"
+        :hasCdn="item.hasCdn"
+      ></circles>
+    </template>
+    <template  v-if="$data.contain.judge.length != 0">
+      <judge
+        v-for="item in $data.contain.judge"
+        :key="item.id"
+        :containObject="item.contain"
+        :y="item.y"
+        :x="item.x"
+        :id="item.id"
+        :value="item.value"
+        :hasCdn="item.hasCdn"
+      ></judge>
+    </template>
     <assist
       v-for="item in $data.contain.assist"
       :key="item.id"
@@ -96,6 +100,7 @@ import assist from '../assist/assist.vue'
 import order from '../order/order.vue'
 
 export default {
+  name: 'judge',
   props: ['model', 'y', 'value', 'containObject', 'x', 'id' , 'hasCdn'],
   components: {
     noRefFunc,

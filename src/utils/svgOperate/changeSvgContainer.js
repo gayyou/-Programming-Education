@@ -1,6 +1,7 @@
 import { toContainer } from './domOperate.js';
 import { whileOption, judgeOption } from './options.js';
 import { getTransform, getTypeAndID, getSvgWH } from '../shared/utils.js'
+import { findList } from '../shared/listUtils'
 
 /**
  * @description 将执行代码块嵌入到循环中。思路是将块先放进目标容器中，然后偏移量transform重新进行设置，
@@ -174,7 +175,17 @@ function nestConditionOperate(target, conTarget, list) {
 
   for (let i = 0; i < list[type].length; i++) {
     if (list[type][i].id == id) {
-      list[type][i].x = 140;
+      switch(conType) {
+        case 'circle': {
+          list[type][i].x = 140;
+          break;
+        }
+        case 'judge': {
+          list[type][i].x = 80;
+          break;
+        }
+      }
+      
       list[type][i].y = 7.5;
     }
   }
@@ -188,17 +199,38 @@ function nestConditionOperate(target, conTarget, list) {
 }
 
 /**
+ * @description 进行分离条件的操作
+ * @param {*} conTarget 容器dom
+ * @param {*} list 列表
+ */
+export function splitConditionOperae(conTarget) {
+  let { id: conID, type: conType } = getTypeAndID(conTarget),
+      list = findList(conTarget, this.$store.state.canvasList);
+
+  for (let i = 0; i < list[conType].length; i++) {
+    if (list[conType][i].id == conID) {
+      list[conType][i].hasCdn = false;
+      break;
+    }
+  }
+}
+
+/**
  * @description 循环语句分离函数
  * @param {Dom} target 
  * @param {Dom} conTarget
- * @version 1.1.0 将其更加抽象画 
+ * @version 1.1.0 将其更加抽象化
  */
 export function splitWhileOperate(target, conTarget) {
   let currentY = conTarget.getAttribute('data-currentY'),
       { height: targetHeight } = getSvgWH(target),
       currentBash = conTarget.getAttribute('data-currentBash'),
-      nextY, nextBash;
+      nextY, nextBash,
+      { type } = getTypeAndID(target);
 
+  if (type == 'condition') {
+    return splitConditionOperae.call(this, conTarget);
+  }
 
   nextBash = currentBash - targetHeight;
 
@@ -220,10 +252,14 @@ export function splitWhileOperate(target, conTarget) {
  * @param {Dom} target 
  * @param {Dom} conTarget 
  */
-export function splitJudgeOperate(target, conTarget) {
+export function splitJudgeOperate(target, conTarget, list) {
   let { id, type } = getTypeAndID(target),
       { id: conID, type: conType } = getTypeAndID(conTarget),
       { y } = getTransform(target);
+
+  if (type == 'condition') {
+    return splitConditionOperae.call(this, conTarget);
+  }
 
   let currentY = parseInt(conTarget.getAttribute('data-currentY')),
       currentSecondY = parseInt(conTarget.getAttribute('data-currentSecondY')),

@@ -49,6 +49,7 @@ export default new Vuex.Store({
     canvasList: {
       
     },
+    choiceTarget: null,
     // 编辑模式左边选择框的模式，一共有 1 2 3 4
     leftStatus: 1,
 

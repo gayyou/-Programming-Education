@@ -1,4 +1,4 @@
-import { getTypeAndID, getTransform, insertSort, cloneSvgInfo } from '../shared/utils'
+import { getTypeAndID, getTransform, insertSort, cloneSvgInfo, listHasTC, findItem } from '../shared/utils'
 import { cloneList } from '../shared/listUtils.js'
 import { isSvgContainer } from '../shared/typeCheck.js'
 
@@ -53,20 +53,28 @@ export function toContainer(target, crashTarget, fromList, toList) {
  * @description 调整conTarget里面块的顺序和位置
  * @param {*} target 正在拖拽的目标
  * @param {*} conList 拖拽目标所在容器列表
- * @param {Dom} conTarget 
+ * @param {Dom} conTarget 拖拽目标的容器
  */
 export function adjustSvgPosi(target, conList, options, conTarget) {
   let childList = [],
-      { id } = getTypeAndID(target), 
+      { type, id } = getTypeAndID(target), 
       { y } = getTransform(target),
       keys = Object.keys(conList);
-  
 
+  if (type == 'condition') {
+    if (isSvgContainer($(target).parent()[0]) && listHasTC('condition', conList)) {
+      let item = findItem($(target).parent()[0], this.$store.state.canvasList);
+      item.hasCdn = true;
+    } else if (isSvgContainer($(target).parent()[0])) {
+      item.hasCdn = false;
+    }
+  }
+  
 
   // 获得所有子节点
   for (let i = 0; i < keys.length; i++) {
     for (let j = 0; j < conList[keys[i]].length; j++) {
-      if (conList[keys[i]][j].id == id) {
+      if (conList[keys[i]][j].id == id && conList[keys[i]][j].type != 'condition') {
         // 正在移动的目标还没有进行更新视图层，所以要获得当前相对于容器的位置
         conList[keys[i]][j].y = y;
       }
@@ -90,6 +98,9 @@ function adjustWhile(childList, options) {
       bashY = options.bashY;
 
   for (let i = 0; i < childList.length; i++) {
+    if (childList[i].type == 'condition') {
+      continue;
+    }
     // 重新更新
     childList[i].x = bashX;
     childList[i].y = bashY;
@@ -97,6 +108,7 @@ function adjustWhile(childList, options) {
     bashY +=childList[i].height;
   }
 
+  // 在视图层改变之前先更新一波
   for (let i = 0; i < childList.length; i++) {
     $('#' + childList[i].id).attr('transform', 'translate(' + childList[i].x + ','+ childList[i].y +')');
   }
@@ -118,6 +130,9 @@ function adjustJudge(childList, conTarget, options) {
   // let textBash = parseInt(conTarget.getAttribute('data-textBash'));
   
   for (let i = 0; i < childList.length; i++) {
+    if (childList[i].type == 'condition') {
+      continue;
+    }
     childList[i].x = bashX;
 
     if (childList[i].y < ifElseLine) {
@@ -144,6 +159,9 @@ function adjustJudge(childList, conTarget, options) {
     bashTextY = options.elseText.bash;
 
     for (let i = 0; i < childList.length; i++) {
+      if (childList[i].type == 'condition') {
+        continue;
+      }
       childList[i].y += options.firstBash + 0.5;
     }
   }
@@ -172,4 +190,15 @@ function adjustJudge(childList, conTarget, options) {
   for (let i = 0; i < childList.length; i++) {
     $('#' + childList[i].id).attr('transform', 'translate(' + childList[i].x + ','+ childList[i].y +')');
   }
+}
+
+/**
+ * @description 对于嵌入或者提出来的时候，对于所有的容器的进行调整
+ * @param {*} target 移动的目标
+ * @param {*} conList 容器列表
+ * @param {*} options 
+ * @param {*} conTarget 
+ */
+export function adjustAllContainer(target, conList, options, conTarget) {
+  
 }

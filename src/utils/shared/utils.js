@@ -236,8 +236,39 @@ export function getTotalPosi(target, rootList) {
     clickList = findList(target, rootList);
   }
 
+  let { x, y } = getTransform(target);
+  bashX += x;
+  bashY += y;
+
   return {
     x: bashX,
     y: bashY
   }
+}
+
+/**
+ * @description 判断含有某个类型的积木块
+ * @param {String} type 类型
+ * @param {*} list 一个展示列表，即一个circle或者judge的contain属性或者根目录
+ */
+export function listHasTC(type, list) {
+  return list[type].length !== 0;
+}
+
+/**
+ * @description 找到对应的项
+ * @param {Dom} target 
+ * @param {List} rootList 
+ */
+export function findItem(target, rootList) {
+  let list = findList(target, rootList),
+      { type, id } = getTypeAndID(target);
+
+  for (let i = 0; i < list[type].length; i++) {
+    if (list[type][i].id == id) {
+      return list[type][i];
+    }
+  }
+
+  return null;
 }

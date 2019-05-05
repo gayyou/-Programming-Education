@@ -24,26 +24,30 @@
       :id="item.id"
       :value="item.value"
     ></noRefFunc>
-    <circles
-      v-for="item in $data.contain.circle"
-      :key="item.id"
-      :containObject="item.contain"
-      :y="item.y"
-      :x="item.x"
-      :id="item.id"
-      :value="item.value"
-      :hasCdn="item.hasCdn"
-    ></circles>
-    <judge
-      v-for="item in $data.contain.judge"
-      :key="item.id"
-      :containObject="item.contain"
-      :y="item.y"
-      :x="item.x"
-      :id="item.id"
-      :value="item.value"
-      :hasCdn="item.hasCdn"
-    ></judge>
+    <template v-if="$data.contain.circle.length != 0">
+      <circles
+        v-for="item in $data.contain.circle"
+        :key="item.id"
+        :containObject="item.contain"
+        :y="item.y"
+        :x="item.x"
+        :id="item.id"
+        :value="item.value"
+        :hasCdn="item.hasCdn"
+      ></circles>
+    </template>
+    <template  v-if="$data.contain.judge.length != 0">
+      <judge
+        v-for="item in $data.contain.judge"
+        :key="item.id"
+        :containObject="item.contain"
+        :y="item.y"
+        :x="item.x"
+        :id="item.id"
+        :value="item.value"
+        :hasCdn="item.hasCdn"
+      ></judge>
+    </template>
     <assist
       v-for="item in $data.contain.assist"
       :key="item.id"
@@ -83,6 +87,7 @@ import assist from '../assist/assist.vue'
 import order from '../order/order.vue'
 
 export default {
+  name: 'circles',
   props: ['model', 'y', 'value', 'containObject', 'x', 'id', 'hasCdn'],
   components: {
     noRefFunc,

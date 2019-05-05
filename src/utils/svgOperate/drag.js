@@ -1,8 +1,8 @@
-import { nestWhileOperate, nestJudgeOperate, splitWhileOperate, splitJudgeOperate } from './changeSvgContainer.js'
+import { nestWhileOperate, nestJudgeOperate, splitWhileOperate, splitJudgeOperate, splitConditionOperae } from './changeSvgContainer.js'
 import { getTransform, getTypeAndID, setTransform, getPathAttr, setPathAttr, cloneSvgInfo } from '../shared/utils'
 import { whileOption, judgeOption } from './options'
 import { adjustSvgPosi, toContainer } from './domOperate.js'
-import { cloneList, findList, deleteFromList, renewList } from '../shared/listUtils'
+import { cloneList, findList, deleteFromList, renewList, renewAllList } from '../shared/listUtils'
 import { svgComponentOption } from '../shared/model.js'
 
 /**
@@ -12,26 +12,40 @@ import { svgComponentOption } from '../shared/model.js'
  * @param {*} crashTarget 
  * @param {*} list 
  * @param {*} conPlaceList 目标容器的list。并不是其contain属性
+ * @variation fromList 目标从哪里拖郭爱爱的容器列表
  */
 export function nestOperate(target, crashResult) {
   let { type: conType, id: conID } = getTypeAndID(crashResult.container);
-  let { type } = getTypeAndID(target);
+  let { type, id } = getTypeAndID(target);
   let fromList = findList(target, this.$store.state.canvasList);
-  let conPlaceList = findList(crashResult.container, this.$store.state.canvasList);
+  let toList = findList(crashResult.container, this.$store.state.canvasList);
 
   // 这里是用switch判断容器的类型，从而更改容器的形状
   switch(conType) {
     case 'circle': {
+      let conTargetList;
+
+      for (let i = 0; i < toList[conType].length; i++) {
+        if (conID == toList[conType][i].id) {
+          conTargetList = toList[conType][i];
+        }
+      }
+
       nestWhileOperate.call(this, target, crashResult.container, fromList);
+      setTimeout(() => {
+        let target = $('#' + id)[0];
+        adjustOperate.call(this, target, crashResult.container, conTargetList.contain);
+      })
       break;
     }
     case 'judge': {
       // 这里会有一个bug，就是先在else语句中添加语句的话，继续添加的if语句中的块，会出差错，原因是else的块没有进行处理
       let conTargetList;
+      let { x, y } = getTransform(target);
 
-      for (let i = 0; i < conPlaceList[conType].length; i++) {
-        if (conID == conPlaceList[conType][i].id) {
-          conTargetList = conPlaceList[conType][i];
+      for (let i = 0; i < toList[conType].length; i++) {
+        if (conID == toList[conType][i].id) {
+          conTargetList = toList[conType][i];
         }
       }
 
@@ -42,9 +56,13 @@ export function nestOperate(target, crashResult) {
       }
       
       setTimeout(() => {
-        let {x, y} = getTransform(target);
+        let target = $('#' + id)[0];
         let {x: conX, y: conY} = getTransform(crashResult.container);
-        target.setAttribute('transform', 'translate(' + (x - conX) + ', ' + (y - conY) + ')');  // 确定放在if或者else
+        if (type != 'condition') {
+          // condition不参与
+          target.setAttribute('transform', 'translate(' + (x - conX) + ', ' + (y - conY) + ')');  // 确定放在if或者else
+        }
+        // this.$store.state.isRenew = !this.$store.state.isRenew;
         adjustOperate.call(this, target, crashResult.container, conTargetList.contain);
       }, 0)
       break;
@@ -54,12 +72,15 @@ export function nestOperate(target, crashResult) {
   let containParam = null;  // 这个是复制原来容器的信息，然后在新创建的对象中进行改变
   // 这里是改变列表中的位置
   if (type == 'judge' || type == 'circle' || type == 'condition') {
+    // 如果是容器的话，先记住之前的状态
     containParam = getPathAttr(target);
   }
   // 上面那些只是很假的可视区域的改变，这里才是对列表进行改变
-  toContainer.bind(this)(target, crashResult.container, fromList, conPlaceList[conType]);
+  toContainer.bind(this)(target, crashResult.container, fromList, toList[conType]);
+
   setTimeout(() => {
     if (containParam) {
+      // 更新视图层后，将之前的容器的状态进行赋值给新的容器这个状态
       let target = $('#' + containParam.id)[0];
       setPathAttr(target, containParam);
     }
@@ -86,7 +107,7 @@ export function spiltOperate(target, conTarget, mousePayload) {
   switch(conType) {
     // 更新容器的状态
     case 'circle': {
-      splitWhileOperate.call(this, target, conTarget);
+      splitWhileOperate.call(this, target, conTarget, fromList);
       break;
     }
 
@@ -136,24 +157,53 @@ export function spiltOperate(target, conTarget, mousePayload) {
  * @time 2019-05-02
  * @version 1.1.0 减少参数List，直接从target和conTarget进行获取list表
  * @param {*} target 正在移动的目标
- * @param {*} conTarget 容器目标
+ * @param {*} conTarget 移动目标的容器列表容器目标
  * @param {*} conList 容器所在的contain属性列表
  */
 export function adjustOperate(target, conTarget, conList) {
-  let { type: conType } = getTypeAndID(conTarget);
-      // conList = findList(target, this.$store.state.canvasList);
-
+  let conType = getTypeAndID(conTarget).type;
   switch(conType) {
     case 'circle': {
       adjustSvgPosi.call(this, target, conList, whileOption);
       break;
     }
-    
+
     case 'judge': {
       adjustSvgPosi.call(this, target, conList, judgeOption, conTarget);
       break;
     }
   }
+  conTarget = $(conTarget).parent()[0];
+  target = $(target).parent()[0];
+  if (conTarget.getAttribute('id') !== 'main-svg-container') {
+    conList = findList(target, this.$store.state.canvasList);
+  } else {
+    conList = this.$store.state.canvasList;
+  }
+  if (conList != this.$store.state.canvasList || 
+    (conList == this.$store.state.canvasList && conTarget.getAttribute('id') !== 'main-svg-container')) {
+    setTimeout(() => {
+      renewAllList(this.$store.state.canvasList);
+      setTimeout(() => {
+        adjustOperate.call(this, target, conTarget, conList);
+      })
+    }, 0);
+  }
+  
+  
+  // let conType = getTypeAndID(conTarget).type;
+  // console.log(conType)
+  // switch(conType) {
+  //   case 'circle': {
+  //     adjustSvgPosi.call(this, target, conList, whileOption);
+  //     break;
+  //   }
+    
+  //   case 'judge': {
+  //     adjustSvgPosi.call(this, target, conList, judgeOption, conTarget);
+  //     break;
+  //   }
+  // }
 }
 
 /**

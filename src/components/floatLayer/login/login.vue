@@ -6,10 +6,12 @@
     </div>
     <div class="login-cutline"></div>
     <div class="login-account">
+      <div class="tips" :style="$data.accIsOK ? 'opacity: 0' : 'opacity: 1'">请填写正确的手机号</div>
       <label for=""><span>手机号</span></label>
       <input id="login-account" type="text" v-model="$data.account" ref="account">
     </div>
     <div class="login-password">
+      <div class="tips" :style="$data.passIsOK ? 'opacity: 0' : 'opacity: 1'">请填写正确长度的密码</div>
       <label for=""><span>密码</span></label>
       <input id="login-password" type="password" v-model="$data.password" ref="password">
     </div>
@@ -34,7 +36,7 @@ export default {
     },
     login(event) {
       let accReg = new RegExp(/^1[3456789]\d{9}$/),
-          passReg = new RegExp(/^.{0,15}$/);
+          passReg = new RegExp(/^.{0,18}$/);
       
       if (!accReg.test(this.$data.account)) {
         this.$data.accIsOK = false;
@@ -87,7 +89,7 @@ export default {
       }
     },
     password(newVal) {
-      let reg = new RegExp(/^.{0,15}$/);
+      let reg = new RegExp(/^.{0,18}$/);
       if (reg.test(this.$data.password)) {
         this.$data.passIsOK = true;
       } else {
@@ -115,7 +117,32 @@ $themeColor: #ed775a;
   height: 5.5rem;
   background-color: #fff;
   border-radius: 36px;
-  overflow: hidden;
+
+  .tips {
+    position: absolute;
+    top: 0.45rem;
+    right: -1.5rem;
+    width: 1.8rem;
+    padding: 0.05rem 0.1rem;
+    background-color: #fff;
+    transition: opacity .75s ease;
+    border: 1px solid rgba($color: #000000, $alpha: 0.3);
+    border-radius: 0.08rem;
+    box-shadow: 0 0 8px rgba($color: #000000, $alpha: 0.1);
+  }
+  .tips::after {
+    position: absolute;
+    display: block;
+    content: "";
+    transform: rotate(45deg);
+    left: -0.069rem;
+    top: 0.12rem;
+    background-color: #fff;
+    width: 0.1rem;
+    height: 0.1rem;
+    border-left: 1px solid rgba($color: #000000, $alpha: 0.3);
+    border-bottom: 1px solid rgba($color: #000000, $alpha: 0.3);
+  }
 
   .login-close {
     width: 100%;
@@ -154,6 +181,7 @@ $themeColor: #ed775a;
   }
 
   .login-account, .login-password {
+    position: relative;
     font-family: 'SourceHanSansCN-Regular';
     margin-top: 0.2rem;
     width: 100%;

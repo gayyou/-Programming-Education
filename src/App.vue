@@ -101,6 +101,12 @@ button {
     cursor:pointer;             
 }
 
+path {
+  stroke-width: 1px;
+  box-sizing: border-box;
+  stroke: rgba($color: #000000, $alpha: .3);
+}
+
 %absolute-center {
   position: absolute;
   transform: translate(-50%, -50%);

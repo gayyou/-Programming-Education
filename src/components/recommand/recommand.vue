@@ -56,6 +56,7 @@ export default {
       eventTarget: null,
       index: 1,
       option: null,
+      subToken: null,
       list: {
           assist: [],
           circle: [{
@@ -328,10 +329,10 @@ export default {
         // nestWhileOperate.bind(this)(target5, container, this.$data.list);
       }, 0);
 
-
-
-
-    PubSub.subscribe('checkRecommand', (e, data) => {
+    this.$data.subToken = PubSub.subscribe('checkRecommand', this.recommandToMain);
+  },
+  methods: {
+    recommandToMain(e, data) {
       if (data.confirm) {
         let $container = $('#container');
         let width = $container.width();
@@ -355,9 +356,8 @@ export default {
       if (data.cancel) {
         // 点击取消时候发生的事情
       }
-    });
-  },
-  methods: {
+      PubSub.unsubscribe(this.$data.subToken);
+    },
     choiceRec(event) {
       if (event.target == event.currentTarget) {
         return ;

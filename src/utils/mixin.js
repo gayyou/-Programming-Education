@@ -1,5 +1,6 @@
 import { listPush, findList } from './shared/listUtils.js'
 import { getTransform, getTypeAndID, getSvgWH } from './shared/utils'
+import { isSvgContainer } from './shared/typeCheck'
 
 /**
  * @description 混入模式，将这个可移动的组件添加一个点击事件,点击将全局的拖拽对象moveTarget赋值为这个组件
@@ -10,6 +11,10 @@ export function eventMixin(that) {
     event.stopPropagation();
     event.preventDefault();
     that.$store.state.moveTarget = that.$el;
+    if (isSvgContainer(that.$el)) {
+      // 容器在点击的时候，会默认选择该容器去作为上传代码的容器
+      that.$store.state.choiceTarget = that.$el;
+    }
     initContainInfo(that);
     setMouseDownInit(event, that);
   }
@@ -68,6 +73,7 @@ export function createModelMixin() {
       width: width,
       height: height,
       id: ID,
+      type,
       value: this.value
     };
     

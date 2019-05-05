@@ -6,15 +6,22 @@
       <span>创造出你的方案</span>
     </div>
     <div class="regist-cutline"></div>
+    <div class="regist-name">
+      <div class="tips" :style="$data.nameIsOK ? 'opacity: 0' : 'opacity: 1'">请填写正确名字</div>
+      <label for="regist-name"><span>名字</span></label>
+      <input id="regist-name" type="text" v-model="$data.name" ref="name">
+    </div>
     <div class="regist-account">
+      <div class="tips" :style="$data.accIsOK ? 'opacity: 0' : 'opacity: 1'">请填写正确的手机号</div>
       <label for="regist-account"><span>手机号</span></label>
       <input id="regist-account" type="text" v-model="$data.account" ref="account">
     </div>
     <div class="regist-password">
+      <div class="tips" :style="$data.passIsOK ? 'opacity: 0' : 'opacity: 1'">请填写正确的密码</div>
       <label for="regist-password"><span>密码</span></label>
       <input id="regist-password" type="password" v-model="$data.password" ref="password">
     </div>
-    <button class="regist-button" id="regist-button">注册</button>
+    <button class="regist-button" id="regist-button" @click="regist">注册</button>
   </div>
 </template>
 
@@ -24,8 +31,10 @@ export default {
     return {
       account: '',
       password: '',
+      name: '',
       accIsOK: true,
-      passIsOK: true
+      passIsOK: true,
+      nameIsOK: true
     }
   },
   methods: {
@@ -34,7 +43,8 @@ export default {
     },
     regist(event) {
       let accReg = new RegExp(/^1[3456789]\d{9}$/),
-          passReg = new RegExp(/^.{0,15}$/);
+          passReg = new RegExp(/^.{0,18}$/),
+          nameReg = new RegExp(/^.{0,18}$/)
       
       if (!accReg.test(this.$data.account)) {
         this.$data.accIsOK = false;
@@ -50,7 +60,8 @@ export default {
       this.axios
       .post('/user/register', {
         userName: this.$data.account,
-        password: this.$data.password
+        password: this.$data.password,
+        name: this.$data.name
       })
       .then((res) => {
         res = JSON.parse(res);
@@ -88,7 +99,7 @@ export default {
       }
     },
     password(newVal) {
-      let reg = new RegExp(/^.{0,15}$/);
+      let reg = new RegExp(/^.{0,18}$/);
       if (reg.test(this.$data.password)) {
         this.$data.passIsOK = true;
       } else {
@@ -96,6 +107,17 @@ export default {
       }
       if (newVal.length > 18) {
         this.$data.password = newVal.slice(0, 18);
+      }
+    },
+    name(newVal) {
+      let reg = new RegExp(/^.{0,15}$/);
+      if (reg.test(this.$data.name)) {
+        this.$data.nameIsOK = true;
+      } else {
+        this.$data.nameIsOK = false;
+      }
+      if (newVal.length > 18) {
+        this.$data.name = newVal.slice(0, 18);
       }
     }
   }
@@ -113,10 +135,35 @@ $themeColor: #ed775a;
 .regist-container {
 
   width: 5.66rem;
-  height: 6.1rem;
+  height: 7.1rem;
   background-color: #fff;
   border-radius: 36px;
-  overflow: hidden;
+
+  .tips {
+    position: absolute;
+    top: 0.45rem;
+    right: -1.5rem;
+    width: 1.8rem;
+    padding: 0.05rem 0.1rem;
+    background-color: #fff;
+    transition: opacity .75s ease;
+    border: 1px solid rgba($color: #000000, $alpha: 0.3);
+    border-radius: 0.08rem;
+    box-shadow: 0 0 8px rgba($color: #000000, $alpha: 0.1);
+  }
+  .tips::after {
+    position: absolute;
+    display: block;
+    content: "";
+    transform: rotate(45deg);
+    left: -0.069rem;
+    top: 0.12rem;
+    background-color: #fff;
+    width: 0.1rem;
+    height: 0.1rem;
+    border-left: 1px solid rgba($color: #000000, $alpha: 0.3);
+    border-bottom: 1px solid rgba($color: #000000, $alpha: 0.3);
+  }
 
   .regist-close {
     width: 100%;
@@ -157,7 +204,8 @@ $themeColor: #ed775a;
     background-color: #f1f1f1;
   }
 
-  .regist-account, .regist-password {
+  .regist-account, .regist-password, .regist-name {
+    position: relative;
     font-family: 'SourceHanSansCN-Regular';
     margin-top: 0.2rem;
     width: 100%;
@@ -190,7 +238,8 @@ $themeColor: #ed775a;
     }
   }
 
-  .regist-password {
+  .regist-password,
+  .regist-name {
     label {
       margin-left: 0.1rem; 
     }

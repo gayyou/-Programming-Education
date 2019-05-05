@@ -11,25 +11,47 @@ import { getTransform, getSvgWH, getTypeAndID } from './utils'
 export function renewList(list, target) {
   let { id: ID } = getTypeAndID(target),
       { x: targetX, y: targetY } = getTransform(target),
-      { width, height } = getSvgWH(target),
-      isFind = false;  // 标识符，标志说否找到目标节点
+      { width, height } = getSvgWH(target);
   
     svgComponentOption.forEach((value) => {
-      if (isFind) {
-        // 如果找到了，并不会进行继续操作。这是因为svgComponentOption一共有6项（以后可以进行拓展）。相当于调用6个遍历函数，isFind可以减少没必要的遍历
-        return ;
-      }
       for (let i = 0; i < list[value].length; i++) {
         if (list[value][i].id === ID) {
           list[value][i].x = targetX;
           list[value][i].y = targetY;
           list[value][i].width = width;
           list[value][i].height = height;
-          isFind = true;
           break;
+        }
+        if (list[value][i].contain) {
+          // 递归遍历整个列表
+          renewList(list[value][i].contain, target);
         }
       }
     });
+}
+
+/**
+ * 
+ * @param {*} list 
+ */
+export function renewAllList(list) {
+  svgComponentOption.forEach((value) => {
+    for (let i = 0; i < list[value].length; i++) {
+      let target = $('#' + list[value][i].id)[0],
+          { width, height } = getSvgWH(target),
+          { x, y } = getTransform(target);
+      
+      list[value][i].width = width;
+      list[value][i].height = height;
+      list[value][i].x = x;
+      list[value][i].y = y;
+
+      if (list[value][i].contain) {
+        // 递归遍历整个列表
+        renewAllList(list[value][i].contain);
+      }
+    }
+  })
 }
 
 /**

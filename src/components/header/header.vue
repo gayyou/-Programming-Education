@@ -66,20 +66,28 @@
 </template>
 
 <script>
+import PubSub from 'pubsub-js'
 export default {
+  mounted() {
+    let token = PubSub.subscribe('update', (e, data) => {
+      PubSub.unsubscribe(token);
+    })
+  },
   methods: {
     update() {
-      this.$store.state.close = false;
-      setTimeout(() => {
-        this.$store.state.loadingFadeIn = true;
-        setTimeout(() => {
-          this.$store.state.str = '编译成功';
-          this.$store.state.point = null;
-          setTimeout(() => {
-            this.$store.state.close = true;
-          }, 1300);
-        }, 2000);
-      }, 10);
+      // this.$store.state.close = false;
+      // setTimeout(() => {
+      //   this.$store.state.loadingFadeIn = true;
+      //   setTimeout(() => {
+      //     this.$store.state.str = '编译成功';
+      //     this.$store.state.point = null;
+      //     setTimeout(() => {
+      //       this.$store.state.close = true;
+      //     }, 1300);
+      //   }, 2000);
+      // }, 10);
+      this.$store.state.showConfirm = true;
+      this.$store.state.confirmMes = '确定上传点击的积木块？'
     },
     // 选择全局的模式
     changeMode(event) {

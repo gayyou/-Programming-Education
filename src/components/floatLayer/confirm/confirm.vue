@@ -34,11 +34,19 @@ export default {
         confirm: false,
         cancel: true
       })
+      PubSub.publish('update', {
+        confirm: false,
+        cancel: true
+      })
     },
     confirmOperate() {
       this.$store.state.showConfirm = false;
       this.$data.isAnimate = false;
       PubSub.publish('checkRecommand', {
+        confirm: true,
+        cancel: false
+      })
+      PubSub.publish('update', {
         confirm: true,
         cancel: false
       })
