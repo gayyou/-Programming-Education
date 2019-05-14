@@ -71,21 +71,22 @@ export function nestOperate(target, crashResult) {
 
   let containParam = null;  // 这个是复制原来容器的信息，然后在新创建的对象中进行改变
   // 这里是改变列表中的位置
-  if (type == 'judge' || type == 'circle' || type == 'condition') {
-    // 如果是容器的话，先记住之前的状态
-    containParam = getPathAttr(target);
-  }
-  // 上面那些只是很假的可视区域的改变，这里才是对列表进行改变
+  // if (type == 'judge' || type == 'circle' || type == 'condition') {
+  //   // 如果是容器的话，先记住之前的状态
+  //   containParam = getPathAttr(target);
+  // }
+  // // 上面那些只是很假的可视区域的改变，这里才是对列表进行改变
   toContainer.bind(this)(target, crashResult.container, fromList, toList[conType]);
 
-  setTimeout(() => {
-    if (containParam) {
-      // 更新视图层后，将之前的容器的状态进行赋值给新的容器这个状态
-      let target = $('#' + containParam.id)[0];
-      setPathAttr(target, containParam);
-    }
-    renewList(this.$store.state.canvasList, crashResult.container);  // 更新碰撞的容器在列表中的大小
-  }, 1)
+  // setTimeout(() => {
+  //   // 作用是记住容器之前的状态
+  //   if (containParam) {
+  //     // 更新视图层后，将之前的容器的状态进行赋值给新的容器这个状态
+  //     let target = $('#' + containParam.id)[0];
+  //     setPathAttr(target, containParam);
+  //   }
+  //   renewList(this.$store.state.canvasList, crashResult.container);  // 更新碰撞的容器在列表中的大小
+  // }, 1)
 }
 
 /**
@@ -135,19 +136,19 @@ export function spiltOperate(target, conTarget, mousePayload) {
 
       let containParam = null;  // 如果拉出去的是容器的话，会对新渲染出来的容器进行改变
       // 这里是改变列表中的位置
-      if (type == 'judge' || type == 'circle' || type == 'condition') {
-        containParam = getPathAttr(target);
-      }
+      // if (type == 'judge' || type == 'circle' || type == 'condition') {
+      //   containParam = getPathAttr(target);
+      // }
 
       toContainer.call(this, target, conTarget, fromList, toList);
 
-      setTimeout(() => {
-        if (containParam) {
-          let target = $('#' + containParam.id)[0];
-          setPathAttr(target, containParam);
-        }
-        renewList(this.$store.state.canvasList, conTarget);  // 更新容器列表
-      }, 1)
+      // setTimeout(() => {
+      //   if (containParam) {
+      //     let target = $('#' + containParam.id)[0];
+      //     setPathAttr(target, containParam);
+      //   }
+      //   renewList(this.$store.state.canvasList, conTarget);  // 更新容器列表
+      // }, 1)
     }
   }
 }
@@ -162,9 +163,10 @@ export function spiltOperate(target, conTarget, mousePayload) {
  */
 export function adjustOperate(target, conTarget, conList) {
   let conType = getTypeAndID(conTarget).type;
+  console.log('进行调整')
   switch(conType) {
     case 'circle': {
-      adjustSvgPosi.call(this, target, conList, whileOption);
+      adjustSvgPosi.call(this, target, conList, whileOption, conTarget);
       break;
     }
 
@@ -173,6 +175,8 @@ export function adjustOperate(target, conTarget, conList) {
       break;
     }
   }
+
+  // 从里至外进行调整容器的大小
   conTarget = $(conTarget).parent()[0];
   target = $(target).parent()[0];
   if (conTarget.getAttribute('id') !== 'main-svg-container') {
@@ -185,14 +189,15 @@ export function adjustOperate(target, conTarget, conList) {
     setTimeout(() => {
       renewAllList(this.$store.state.canvasList);
       setTimeout(() => {
+        this.$store.state.isRenew = !this.$store.state.isRenew;  // 更新时机很重要
         adjustOperate.call(this, target, conTarget, conList);
-      })
+      }, 0)
     }, 0);
   }
   
   
   // let conType = getTypeAndID(conTarget).type;
-  // console.log(conType)
+  // // console.log(conType)
   // switch(conType) {
   //   case 'circle': {
   //     adjustSvgPosi.call(this, target, conList, whileOption);
@@ -205,6 +210,11 @@ export function adjustOperate(target, conTarget, conList) {
   //   }
   // }
 }
+
+// function ajustConWH(conTarget) {
+//   let contain = findConCspList(conTarget, this.$store.state.canvasList),
+
+// }
 
 /**
  * @description 在最外层的容器中进行删除偏左的块

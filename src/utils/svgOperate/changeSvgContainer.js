@@ -1,7 +1,7 @@
 import { toContainer } from './domOperate.js';
 import { whileOption, judgeOption } from './options.js';
 import { getTransform, getTypeAndID, getSvgWH } from '../shared/utils.js'
-import { findList } from '../shared/listUtils'
+import { findList, findItem } from '../shared/listUtils'
 
 /**
  * @description 将执行代码块嵌入到循环中。思路是将块先放进目标容器中，然后偏移量transform重新进行设置，
@@ -22,13 +22,16 @@ export function nestWhileOperate(target, conTarget, list) {
   }
   
   // 先得到之前的循环框的内嵌块的起点currentY和path中的延伸长度起点
-  let currentY = parseInt(conTarget.getAttribute('data-currentY')),
-      currentBash = parseInt(conTarget.getAttribute('data-currentBash')),
-      nextY, nextBash,
+  let nextY, nextBash,
       targetInfo = target.getBBox(),
       height = targetInfo.height;
-  
-  // 先寻找目标块在哪，设置其在内嵌块中的位置
+
+  // 寻找容器的item，这里后期可以优化，不要从根目录找起
+  let item = findItem(conTarget, this.$store.state.canvasList),
+      { firstBash, currentY } = item.svgOptions,
+      currentBash = firstBash;
+
+  // 这里将嵌入块重新设置坐标，因为坐标是相对坐标，相对于容器坐标
   for (let i = 0; i < list[type].length; i++) {
     if (list[type][i].id == id) {
       list[type][i].x = whileOption.bashX;
@@ -47,16 +50,10 @@ export function nestWhileOperate(target, conTarget, list) {
 
   nextY = currentY + height;  // 下个内嵌进来的元素的transform的基础值！
 
-  conTarget.setAttribute('data-currentY', nextY);  // 将其设置到碰撞容器中，方便下次进行获取
-  conTarget.setAttribute('data-currentBash', nextBash);
-  let nextD = whileOption.firstHalf + ' ' + nextBash + ' ' + whileOption.lastHalf; // 设置为path的值
-  conTarget.getElementsByClassName('out-line')[0].setAttribute('d', nextD); // 赋值path值
-
-  // 返回一个对象，这里可以删了，但是如果后期把以上数据存入到列表中，要返回这两个对象
-  return {
-    target: conID,
-    nextD
-  };
+  item.svgOptions = {
+    firstBash: nextBash,
+    currentY: nextY
+  }
 }
 
 /**
@@ -79,14 +76,11 @@ export function nestJudgeOperate(target, conTarget, list, isIf) {
   }
 
   // 获得之前的所有数据
-  let currentY = parseInt(conTarget.getAttribute('data-currentY')),
-      currentSecondY = parseInt(conTarget.getAttribute('data-currentSecondY')),
-      firstBash = parseInt(conTarget.getAttribute('data-firstBash')),
-      secondBash = parseInt(conTarget.getAttribute('data-secondBash')),
-      textBash = parseInt(conTarget.getAttribute('data-textBash')),
-      firstTime = parseInt(conTarget.getAttribute('data-firstTime')),
-      { height } = getSvgWH(target),
+  let { height } = getSvgWH(target),
       nextY, nextFirstBash, nextSecondBash, nextTextBash;
+
+  let item = findItem(conTarget, this.$store.state.canvasList),
+      { firstBash, secondBash, textBash, firstTime, currentY, currentSecondY } = item.svgOptions;
 
   if (isIf) {
     let nextSecondY;
@@ -101,15 +95,15 @@ export function nestJudgeOperate(target, conTarget, list, isIf) {
       nextTextBash = height + textBash;
       nextSecondY = height + currentSecondY;  // 要更改第二个的初始位置
     }
-    let nextD = judgeOption.firstHalf
-              + nextFirstBash
-              + judgeOption.secondHalf
-              + secondBash    // 这里需要加之前的第二个基础，因为在if中插入的时候并不会影响第二个
-              + judgeOption.lastHalf;
+    // let nextD = judgeOption.firstHalf
+    //           + nextFirstBash
+    //           + judgeOption.secondHalf
+    //           + secondBash    // 这里需要加之前的第二个基础，因为在if中插入的时候并不会影响第二个
+    //           + judgeOption.lastHalf;
     
-    let nextText = judgeOption.elseText.firstHalf
-                 + nextTextBash
-                 + judgeOption.elseText.lastHalf;
+    // let nextText = judgeOption.elseText.firstHalf
+    //              + nextTextBash
+    //              + judgeOption.elseText.lastHalf;
     
     firstTime = parseInt(firstTime) + 1;
 
@@ -120,16 +114,17 @@ export function nestJudgeOperate(target, conTarget, list, isIf) {
       }
     }
 
-    conTarget.getElementsByClassName('out-line')[0].setAttribute('d', nextD); // 赋值path值
-    // conTarget.getElementsByClassName('else')[0].setAttribute('transform', nextText); // 赋值文本transform
-    conTarget.setAttribute('data-firstTime', firstTime);
 
     nextY = currentY + height;
 
-    conTarget.setAttribute('data-currentY', nextY);  // 将其设置到碰撞容器中，方便下次进行获取
-    conTarget.setAttribute('data-firstBash', nextFirstBash);  // 将其设置到碰撞容器中，方便下次进行获取
-    conTarget.setAttribute('data-textBash', nextTextBash);  // 将其设置到碰撞容器中，方便下次进行获取
-    conTarget.setAttribute('data-currentSecondY', nextSecondY);
+    item.svgOptions = {
+      firstBash: nextFirstBash,
+      secondBash: nextSecondBash,
+      textBash,
+      firstTime,
+      currentY: nextY,
+      currentSecondY: nextSecondY
+    }
   } else {
     if (secondBash == judgeOption.secondBash) {
       nextSecondBash = secondBash - height + 23.5;
@@ -139,11 +134,17 @@ export function nestJudgeOperate(target, conTarget, list, isIf) {
       nextFirstBash = height + firstBash;
     }
 
-    let nextD = judgeOption.firstHalf 
-              + nextFirstBash 
-              + judgeOption.secondHalf
-              + nextSecondBash    // 这里需要加之前的第二个基础，因为在if中插入的时候并不会影响第二个
-              + judgeOption.lastHalf;
+    // let nextD = judgeOption.firstHalf 
+    //           + nextFirstBash 
+    //           + judgeOption.secondHalf
+    //           + nextSecondBash    // 这里需要加之前的第二个基础，因为在if中插入的时候并不会影响第二个
+    //           + judgeOption.lastHalf;
+
+    item.svgOptions = {
+      firstBash: nextFirstBash,
+      secondBash: nextSecondBash,
+      textBash: textBash
+    }
 
     for (let i = 0; i < list[type].length; i++) {
       if (list[type][i].id == id) {
@@ -152,13 +153,22 @@ export function nestJudgeOperate(target, conTarget, list, isIf) {
       }
     }
 
-    conTarget.getElementsByClassName('out-line')[0].setAttribute('d', nextD); // 赋值path值
+    // conTarget.getElementsByClassName('out-line')[0].setAttribute('d', nextD); // 赋值path值
 
     // 下面是设置
     nextY = currentSecondY + height;
-    conTarget.setAttribute('data-currentSecondY', nextY);  // 将其设置到碰撞容器中，方便下次进行获取
-    conTarget.setAttribute('data-secondBash', nextSecondBash);  // 将其设置到碰撞容器中，方便下次进行获取
-    conTarget.setAttribute('data-firstBash', nextFirstBash);  // 将其设置到碰撞容器中，方便下次进行获取
+    // conTarget.setAttribute('data-currentSecondY', nextY);  // 将其设置到碰撞容器中，方便下次进行获取
+    // conTarget.setAttribute('data-secondBash', nextSecondBash);  // 将其设置到碰撞容器中，方便下次进行获取
+    // conTarget.setAttribute('data-firstBash', nextFirstBash);  // 将其设置到碰撞容器中，方便下次进行获取
+
+    item.svgOptions = {
+      firstBash: nextFirstBash,
+      secondBash: nextSecondBash,
+      textBash,
+      firstTime,
+      currentY,
+      currentSecondY: nextY
+    }
   }
 }
 
@@ -222,15 +232,17 @@ export function splitConditionOperae(conTarget) {
  * @version 1.1.0 将其更加抽象化
  */
 export function splitWhileOperate(target, conTarget) {
-  let currentY = conTarget.getAttribute('data-currentY'),
-      { height: targetHeight } = getSvgWH(target),
-      currentBash = conTarget.getAttribute('data-currentBash'),
+  let { height: targetHeight } = getSvgWH(target),
       nextY, nextBash,
       { type } = getTypeAndID(target);
 
   if (type == 'condition') {
     return splitConditionOperae.call(this, conTarget);
   }
+
+  let item = findItem(conTarget, this.$store.state.canvasList),
+      { firstBash, currentY } = item.svgOptions.firstBash,
+      currentBash = firstBash;
 
   nextBash = currentBash - targetHeight;
 
@@ -240,11 +252,10 @@ export function splitWhileOperate(target, conTarget) {
 
   nextY = currentY - targetHeight;
 
-  conTarget.setAttribute('data-currentY', nextY);
-  conTarget.setAttribute('data-currentBash', nextBash);
-
-  let nextD = whileOption.firstHalf + ' ' + nextBash + ' ' + whileOption.lastHalf;  // 设置path值
-  conTarget.getElementsByClassName('out-line')[0].setAttribute('d', nextD);
+  item.svgOptions = {
+    firstBash: nextBash,
+    currentY: nextY
+  };
 }
 
 /**
@@ -261,14 +272,11 @@ export function splitJudgeOperate(target, conTarget, list) {
     return splitConditionOperae.call(this, conTarget);
   }
 
-  let currentY = parseInt(conTarget.getAttribute('data-currentY')),
-      currentSecondY = parseInt(conTarget.getAttribute('data-currentSecondY')),
-      firstBash = parseInt(conTarget.getAttribute('data-firstBash')),
-      secondBash = parseInt(conTarget.getAttribute('data-secondBash')),
-      textBash = parseInt(conTarget.getAttribute('data-textBash')),
-      firstTime = parseInt(conTarget.getAttribute('data-firstTime')),
-      { height } = getSvgWH(target),
+  let { height } = getSvgWH(target),
       nextY, nextFirstBash, nextSecondBash, nextTextBash, isIf;
+
+  let item = findItem(conTarget, this.$store.state.canvasList),
+      { firstBash, secondBash, textBash, currentY, currentSecondY, firstTime } = item.svgOptions;
 
   let ifElseLine = conTarget.getElementsByClassName('else')[0].getAttribute('transform');
   ifElseLine = parseInt(ifElseLine.split(' ')[5]);
@@ -315,14 +323,17 @@ export function splitJudgeOperate(target, conTarget, list) {
 
     // conTarget.getElementsByClassName('out-line')[0].setAttribute('d', nextD); // 赋值path值
     // conTarget.getElementsByClassName('else')[0].setAttribute('transform', nextText); // 赋值文本transform
-    conTarget.setAttribute('data-firstTime', firstTime);
 
     nextY = currentY + height;
 
-    conTarget.setAttribute('data-currentY', nextY);  // 将其设置到碰撞容器中，方便下次进行获取
-    conTarget.setAttribute('data-firstBash', nextFirstBash);  // 将其设置到碰撞容器中，方便下次进行获取
-    conTarget.setAttribute('data-textBash', nextTextBash);  // 将其设置到碰撞容器中，方便下次进行获取
-    conTarget.setAttribute('data-currentSecondY', nextSecondY);
+    item.svgOptions = {
+      firstBash: nextFirstBash,
+      secondBash: secondBash,
+      textBash: nextTextBash,
+      firstTime,
+      currentY: nextY,
+      currentSecondY: nextSecondY
+    }
   } else {
     if (secondBash == judgeOption.secondBash) {
       nextSecondBash = secondBash - height + 23.5;
@@ -349,8 +360,14 @@ export function splitJudgeOperate(target, conTarget, list) {
 
     // 下面是设置
     nextY = currentSecondY + height;
-    conTarget.setAttribute('data-currentSecondY', nextY);  // 将其设置到碰撞容器中，方便下次进行获取
-    conTarget.setAttribute('data-secondBash', nextSecondBash);  // 将其设置到碰撞容器中，方便下次进行获取
-    conTarget.setAttribute('data-firstBash', nextFirstBash);  // 将其设置到碰撞容器中，方便下次进行获取
+
+    item.svgOptions = {
+      firstBash: nextFirstBash,
+      secondBash: nextSecondBash,
+      textBash,
+      currentY,
+      currentSecondY: nextY,
+      firstTime
+    }
   }
 }

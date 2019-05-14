@@ -27,7 +27,7 @@ export function getTransform(target) {
  * @param {Dom} target 目标dom节点
  */
 export function getSvgWH(target) {
-  if (isUndef(target)) {
+  if (isUndef(target) || target == null) {
     return null;
   }
 

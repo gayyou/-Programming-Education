@@ -12,7 +12,7 @@ export function isCrash(target, rootList, payload) {
   let resData = null;
   resData = checkCrash(target, rootList, rootList, payload);
 
-  console.log('resData', resData);
+  // console.log('resData', resData);
 
   return resData;
 }
@@ -27,7 +27,7 @@ function checkCrash(target, list, rootList, beforeChangeSizeCon) {
 
   for (let i = 0; i < keys.length; i++) {
     if (!isSvgContainer(keys[i])) {
-      console.log('不是容器', keys[i])
+      // console.log('不是容器', keys[i])
       // 不是容器的话，跳过
       continue;
     }

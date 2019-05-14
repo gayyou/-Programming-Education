@@ -18,7 +18,6 @@ export function changeSvgPosi(target) {
       renewList(conList, target);
     }, 0);
   }
-  console.log('调整位置')
 }
 
 /**
@@ -28,7 +27,6 @@ export function changeSvgPosi(target) {
 export function changeSvgNest(target, crashResult, event) {
   let conList = findList(target, this.$store.state.canvasList),
       toConList = null;
-  console.log('调整嵌套')
   if (!crashResult) {
     toConList = this.$store.state.canvasList;  // 没有发生碰撞的时候
   } else {

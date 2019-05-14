@@ -13,21 +13,21 @@ export function renewList(list, target) {
       { x: targetX, y: targetY } = getTransform(target),
       { width, height } = getSvgWH(target);
   
-    svgComponentOption.forEach((value) => {
-      for (let i = 0; i < list[value].length; i++) {
-        if (list[value][i].id === ID) {
-          list[value][i].x = targetX;
-          list[value][i].y = targetY;
-          list[value][i].width = width;
-          list[value][i].height = height;
-          break;
-        }
-        if (list[value][i].contain) {
-          // 递归遍历整个列表
-          renewList(list[value][i].contain, target);
-        }
+  svgComponentOption.forEach((value) => {
+    for (let i = 0; i < list[value].length; i++) {
+      if (list[value][i].id === ID) {
+        list[value][i].x = targetX;
+        list[value][i].y = targetY;
+        list[value][i].width = width;
+        list[value][i].height = height;
+        break;
       }
-    });
+      if (list[value][i].contain) {
+        // 递归遍历整个列表
+        renewList(list[value][i].contain, target);
+      }
+    }
+  });
 }
 
 /**
@@ -35,23 +35,42 @@ export function renewList(list, target) {
  * @param {*} list 
  */
 export function renewAllList(list) {
-  svgComponentOption.forEach((value) => {
-    for (let i = 0; i < list[value].length; i++) {
-      let target = $('#' + list[value][i].id)[0],
+  let keys = Object.keys(list);
+
+  for (let i = 0; i < keys.length; i++) {
+    for (let j = 0; j < list[keys[i]].length; j++) {
+      let target = $('#' + list[keys[i]][j].id)[0],
           { width, height } = getSvgWH(target),
           { x, y } = getTransform(target);
-      
-      list[value][i].width = width;
-      list[value][i].height = height;
-      list[value][i].x = x;
-      list[value][i].y = y;
 
-      if (list[value][i].contain) {
-        // 递归遍历整个列表
-        renewAllList(list[value][i].contain);
-      }
+          list[keys[i]][j].width = width;
+          list[keys[i]][j].height = height;
+          list[keys[i]][j].x = x;
+          list[keys[i]][j].y = y;
+
+          if (list[keys[i]][j].contain) {
+            // 递归遍历整个列表
+            renewAllList(list[keys[i]][j].contain);
+          }
     }
-  })
+  }
+  // svgComponentOption.forEach((value) => {
+  //   for (let i = 0; i < list[value].length; i++) {
+  //     let target = $('#' + list[value][i].id)[0],
+  //         { width, height } = getSvgWH(target),
+  //         { x, y } = getTransform(target);
+      
+  //     list[value][i].width = width;
+  //     list[value][i].height = height;
+  //     list[value][i].x = x;
+  //     list[value][i].y = y;
+
+  //     if (list[value][i].contain) {
+  //       // 递归遍历整个列表
+  //       renewAllList(list[value][i].contain);
+  //     }
+  //   }
+  // })
 }
 
 /**
@@ -139,6 +158,24 @@ export function findList(target, listObj) {
 }
 
 /**
+ * @description 查找目标所在的list
+ * @param {Dom} target 目标
+ * @param {List} list 想要查询的List，一般是根节点
+ */
+export function findItem(target, list) {
+  let resultList = findList(target, list),
+      { id, type } = getTypeAndID(target);
+
+  for (let i = 0; i < resultList[type].length; i++) {
+    if (resultList[type][i].id == id) {
+      return resultList[type][i];
+    }
+  }
+  
+  return null;
+}
+
+/**
  * @description 找到容器节点对应的list表,返回对应的列表,即列表中该对象的contain属性
  * @param {Dom} conTarget 
  * @param {List} list 根列表
@@ -219,5 +256,31 @@ export function deleteFromList(list) {
     if (list[i].x < 290) {
       list.splice(i, 1);
     }
+  }
+}
+
+/**
+ * @description 对于
+ * @param {List} list 
+ * @returns { Number } 返回这个积木块的高度
+ */
+export function adjustList(list, conID) {
+  let bashH = 0,
+      keys = Object.keys(list);
+
+  for (let i = 0; i < keys.length; i++) {
+    for (let j = 0; j < list[keys[i]].length; j++) {
+      if (list[keys[i]][j].contain) {
+        // 如果有的话，递归遍历这个容器
+        bashH += adjustList(list[keys[i]][j].contain);
+      } else {
+        bashH += getSvgWH($('#' + list[keys[i]][j].id)[0]);
+      }
+    }
+  }
+
+  // 进行赋值
+  if (conID) {
+    
   }
 }

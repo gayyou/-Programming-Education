@@ -32,6 +32,16 @@ export const judgeOption = {
   lastHalf: 'c0-2.2,1.8-4,4-4h88c13.3,0,24-10.7,24-24v0   c0-13.3-10.7-24-24-24H28c-2.2,0-4-1.8-4-4V52c0-2.2,1.8-4,4-4h88C129.3,48,140,37.3,140,24z',
 }
 
-export const conditionOption = {
-  
+export const renewWhileOption = {
+  firstBash: 36,
+  currentY: 48
+}
+
+export const renewJudgeOption = {
+  firstBash: 24,
+  secondBash: -16,
+  textBash: 100.3763,
+  currentY: 48,
+  firstTime: 1,
+  currentSecondY: 120
 }

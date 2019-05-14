@@ -79,6 +79,7 @@
         :value="item.value"
         :model="false"
         :hasCdn="item.hasCdn"
+        :svgOptions="item.svgOptions"
       ></circles>
       <judge
         v-for="item in $store.state.canvasList.judge"
@@ -90,6 +91,7 @@
         :value="item.value"
         :model="false"
         :hasCdn="item.hasCdn"
+        :svgOptions="item.svgOptions"
       ></judge>
       <assist
         v-for="item in $store.state.canvasList.assist"
@@ -205,6 +207,9 @@
         :x="20"
         :value="'循环'"
         :containObject="{}"
+        :svgOptions="{
+          firstBash: 36
+        }"
       ></circles>
       <judge
         :model="true"
@@ -212,6 +217,11 @@
         :x="20"
         :value="'判断'"
         :containObject="{}"
+        :svgOptions="{
+          firstBash: 24,
+          secondBash: -16,
+          textBash: 100.3763
+        }"
       ></judge>
       <circles
         id="fake-circle"
@@ -220,6 +230,9 @@
         :value="$store.state.model.value"
         :y="$store.state.model.y"
         :x="$store.state.model.x"
+        :svgOptions="{
+          firstBash: 36
+        }"
       ></circles>
       <judge
         id="fake-judge"
@@ -228,6 +241,11 @@
         :value="$store.state.model.value"
         :y="$store.state.model.y"
         :x="$store.state.model.x"
+        :svgOptions="{
+          firstBash: 24,
+          secondBash: -16,
+          textBash: 100.3763
+        }"
       ></judge>
 
 
@@ -335,7 +353,6 @@
         :y="250"
         :x="20"
       ></assist>
-
       <assist
         id="fake-assist"
         v-if="$store.state.model.type === 'assist'"
@@ -360,8 +377,9 @@ import condition from '../logicAssets/condition/condition.vue'
 import noRefFunc from '../logicAssets/noRefFunc/noRefFunc.vue'
 import assist from '../logicAssets/assist/assist.vue'
 import Vue from 'vue';
+import { renewWhileOption, renewJudgeOption } from '../../utils/svgOperate/options.js'
 import { isCrash } from '../../utils/svgOperate/checkCrash.js'
-import { renewList, findList, componentListMixin } from '../../utils/shared/listUtils.js'
+import { renewList, findList, componentListMixin, renewAllList, findItem } from '../../utils/shared/listUtils.js'
 import { nestOperate, spiltOperate, deleteOperate } from '../../utils/svgOperate/drag.js'
 import { getTransform, getTypeAndID } from '../../utils/shared/utils.js'
 import { adjustOperate } from '../../utils/svgOperate/drag.js'
@@ -389,6 +407,7 @@ export default {
     }
   },
   mounted() {
+    window.temp = this.$store.state.canvasList
     componentListMixin(this.$store.state.canvasList);
   },
   methods: {
@@ -526,11 +545,11 @@ export default {
           deleteOperate(this.$store.state.canvasList)
         })
 
-        renewList(this.$store.state.canvasList, target);
+        renewAllList(this.$store.state.canvasList);
         
         setTimeout(() => {
           this.$store.state.isRenew = !this.$store.state.isRenew;
-        })
+        }, 0)
         // 更新列表
         this.$store.state.containInfo.isUsed = true;
         this.$store.state.moveTarget = null;

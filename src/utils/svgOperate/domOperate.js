@@ -59,6 +59,7 @@ export function adjustSvgPosi(target, conList, options, conTarget) {
   let childList = [],
       { type, id } = getTypeAndID(target), 
       { y } = getTransform(target),
+      { type: conType } = getTypeAndID(conTarget),
       keys = Object.keys(conList);
 
   if (type == 'condition') {
@@ -84,18 +85,21 @@ export function adjustSvgPosi(target, conList, options, conTarget) {
 
   insertSort(childList); // 排序
 
-  if (conTarget) {
+  if (conType == 'judge') {
     // payload有东西，说明是judge的调整
-    adjustJudge(childList, conTarget, options)
+    adjustJudge.call(this, childList, conTarget, options)
   } else {
     // 对circle的调整
-    adjustWhile(childList, options);
+    adjustWhile.call(this, childList, conTarget, options);
   }
 }
 
-function adjustWhile(childList, options) {
+function adjustWhile(childList, conTarget, options) {
   let bashX = options.bashX,
-      bashY = options.bashY;
+      bashY = options.bashY,
+      currentBash = 24,
+      nextBash = 0,
+      item = findItem(conTarget, this.$store.state.canvasList);
 
   for (let i = 0; i < childList.length; i++) {
     if (childList[i].type == 'condition') {
@@ -105,8 +109,27 @@ function adjustWhile(childList, options) {
     childList[i].x = bashX;
     childList[i].y = bashY;
 
-    bashY +=childList[i].height;
+    bashY += childList[i].height;
+
+    if (currentBash <= options.firstBash + 12) {
+      // 第一次的时候，因为会有空隙，所以while循环块的扩大会比目标的height还要大出12
+      currentBash = childList[i].height + options.pathBash;  // 这个12是通过试验得出的。
+    } else {
+      // 第二次及以后，则直接加上increationY这么大
+      currentBash = childList[i].height + currentBash;
+    }
   }
+
+  if (currentBash == 24) {
+    currentBash += 12;
+  }
+
+  item.svgOptions = {
+    firstBash: currentBash,
+    currentY: bashY
+  }
+
+  
 
   // 在视图层改变之前先更新一波
   for (let i = 0; i < childList.length; i++) {
@@ -123,7 +146,8 @@ function adjustJudge(childList, conTarget, options) {
       secondBash = options.secondBash,
       secFlag = false,
       firstFlag = false,
-      ifElseLine = conTarget.getElementsByClassName('else')[0].getAttribute('transform');
+      ifElseLine = conTarget.getElementsByClassName('else')[0].getAttribute('transform'),
+      item = findItem(conTarget, this.$store.state.canvasList);
 
   ifElseLine = parseInt(ifElseLine.split(' ')[5]);
 
@@ -175,18 +199,23 @@ function adjustJudge(childList, conTarget, options) {
   }
   
 
-  let nextText = options.elseText.firstHalf
-               + bashTextY
-               + options.elseText.lastHalf;
+  // let nextText = options.elseText.firstHalf
+  //              + bashTextY
+  //              + options.elseText.lastHalf;
 
-  let nextD = options.firstHalf 
-            + firstBash 
-            + options.secondHalf
-            + secondBash    // 这里需要加之前的第二个基础，因为在if中插入的时候并不会影响第二个
-            + options.lastHalf;
+  // let nextD = options.firstHalf 
+  //           + firstBash 
+  //           + options.secondHalf
+  //           + secondBash    // 这里需要加之前的第二个基础，因为在if中插入的时候并不会影响第二个
+  //           + options.lastHalf;
+
   
-  conTarget.getElementsByClassName('out-line')[0].setAttribute('d', nextD);
-  conTarget.getElementsByClassName('else')[0].setAttribute('transform', nextText); // 文本位置
+  
+  // conTarget.getElementsByClassName('out-line')[0].setAttribute('d', nextD);
+  // conTarget.getElementsByClassName('else')[0].setAttribute('transform', nextText); // 文本位置
+  item.svgOptions.firstBash = firstBash;
+  item.svgOptions.secondBash = secondBash;
+  item.svgOptions.textBash = bashTextY;
   for (let i = 0; i < childList.length; i++) {
     $('#' + childList[i].id).attr('transform', 'translate(' + childList[i].x + ','+ childList[i].y +')');
   }

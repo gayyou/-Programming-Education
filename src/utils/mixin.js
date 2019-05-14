@@ -1,6 +1,7 @@
 import { listPush, findList } from './shared/listUtils.js'
 import { getTransform, getTypeAndID, getSvgWH } from './shared/utils'
 import { isSvgContainer } from './shared/typeCheck'
+import { renewWhileOption, renewJudgeOption } from './svgOperate/options'
 
 /**
  * @description 混入模式，将这个可移动的组件添加一个点击事件,点击将全局的拖拽对象moveTarget赋值为这个组件
@@ -42,7 +43,7 @@ function initContainInfo(that) {
  * @param {DOM} el 组件的
  */
 export function initMixin() {
-  console.log(this)
+  // // // // console.log(this)
 }
 
 export function createModelMixin() {
@@ -77,11 +78,21 @@ export function createModelMixin() {
       value: this.value
     };
     
+    switch(type) {
+      case 'judge': {
+        newItem.svgOptions = Object.assign({}, renewJudgeOption);
+        break;
+      }
+      case 'circle': {
+        newItem.svgOptions = Object.assign({}, renewWhileOption);
+        break;
+      }
+    }
+
     // 列表的插入 操作
     listPush.bind(this)(list, type, newItem);
 
     setTimeout(() => {
-      // console.log(this)
       let fakeTarget = $('#fake-' + type)[0];
       let targetList = $('#main-svg-container>.' + type);
 
@@ -94,7 +105,6 @@ export function createModelMixin() {
 }
 
 function setMouseDownInit(event, that) {
-  console.log(that)
   that.$store.state.mouse.x = event.clientX;
   that.$store.state.mouse.y = event.clientY;
   setTimeout(() => {

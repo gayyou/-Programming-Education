@@ -13,11 +13,9 @@
      :transform="'translate('+ x +','+ y +')'"
      :id="id">
     <g>
-      <path class="st0 out-line" d="M140,24L140,24c0-13.3-10.7-24-24-24L12,0C5.4,0,0,5.4,0,12v36v24v48v24v12c0,6.6,5.4,12,12,12h46
-        c6.6,0,12-5.4,12-12v0c0-6.6-5.4-12-12-12H28c-2.2,0-4-1.8-4-4v-16c0-2.2,1.8-4,4-4h88c13.3,0,24-10.7,24-24v0
-        c0-13.3-10.7-24-24-24H28c-2.2,0-4-1.8-4-4V52c0-2.2,1.8-4,4-4h88C129.3,48,140,37.3,140,24z"/>
+      <path class="st0 out-line" :d="'M140,24L140,24c0-13.3-10.7-24-24-24L12,0C5.4,0,0,5.4,0,12v36v24v48v' + svgOptions.firstBash + 'v12c0,6.6,5.4,12,12,12h46c6.6,0,12-5.4,12-12v0c0-6.6-5.4-12-12-12H28c-2.2,0-4-1.8-4-4v'+ svgOptions.secondBash +'c0-2.2,1.8-4,4-4h88c13.3,0,24-10.7,24-24v0c0-13.3-10.7-24-24-24H28c-2.2,0-4-1.8-4-4V52c0-2.2,1.8-4,4-4h88C129.3,48,140,37.3,140,24z'"/>
       <text transform="matrix(1 0 0 1 24.3335 30.3763)" class="st1 st2 st3">如果</text>
-      <text transform="matrix(1 0 0 1 24.3335 100.3763)" class="st1 st2 st3 else">否则</text>
+      <text :transform="'matrix(1 0 0 1 24.3335 ' + svgOptions.textBash + ')'" class="st1 st2 st3 else">否则</text>
       <polygon class="st4" :style="hasCdn ? 'display: none' : 'display: block'" points="106,12.3 82,12.3 70,25.3 82,38.3 106,38.3 118,25.3 	"/>
       <g transform="translate(110,0)" :style="hasCdn ? 'display: block' : 'display: none'" class="extend-line">
         <path class="st0" d="M138,48H12C5.4,48,0,42.6,0,36V12C0,5.4,5.4,0,12,0l126,0c13.3,0,24,10.7,24,24v0C162,37.3,151.3,48,138,48z"	/>
@@ -41,9 +39,10 @@
         :id="item.id"
         :value="item.value"
         :hasCdn="item.hasCdn"
+        :svgOptions="item.svgOptions"
       ></circles>
     </template>
-    <template  v-if="$data.contain.judge.length != 0">
+    <template v-if="$data.contain.judge.length != 0">
       <judge
         v-for="item in $data.contain.judge"
         :key="item.id"
@@ -53,6 +52,7 @@
         :id="item.id"
         :value="item.value"
         :hasCdn="item.hasCdn"
+        :svgOptions="item.svgOptions"
       ></judge>
     </template>
     <assist
@@ -101,7 +101,7 @@ import order from '../order/order.vue'
 
 export default {
   name: 'judgeCpy',
-  props: ['model', 'y', 'value', 'containObject', 'x', 'id' , 'hasCdn'],
+  props: ['model', 'y', 'value', 'containObject', 'x', 'id' , 'hasCdn', 'svgOptions'],
   components: {
     noRefFunc,
     circles,
