@@ -63,7 +63,7 @@ function checkCrash(target, list, rootList, beforeChangeSizeCon) {
         beforeChangeSizeCon.isUsed = true;
       }
 
-      if (targetX - tempX > 0 && targetX - tempX < 24) {
+      if (targetX - tempX > 0 && targetX - tempX < 26) {
         xFlag = 1;
       }
 

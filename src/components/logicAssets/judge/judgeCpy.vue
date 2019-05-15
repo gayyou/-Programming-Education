@@ -13,13 +13,16 @@
      :transform="'translate('+ x +','+ y +')'"
      :id="id">
     <g>
-      <path class="st0 out-line" :d="'M140,24L140,24c0-13.3-10.7-24-24-24L12,0C5.4,0,0,5.4,0,12v36v24v48v' + svgOptions.firstBash + 'v12c0,6.6,5.4,12,12,12h46c6.6,0,12-5.4,12-12v0c0-6.6-5.4-12-12-12H28c-2.2,0-4-1.8-4-4v'+ svgOptions.secondBash +'c0-2.2,1.8-4,4-4h88c13.3,0,24-10.7,24-24v0c0-13.3-10.7-24-24-24H28c-2.2,0-4-1.8-4-4V52c0-2.2,1.8-4,4-4h88C129.3,48,140,37.3,140,24z'"/>
+      <path d="M24,50 L100,50" class="st12 underline" fill="#000" stroke-width="3px" opacity="0"></path>
+      <path class="st0 out-line choice-path" :d="'M140,24L140,24c0-13.3-10.7-24-24-24L12,0C5.4,0,0,5.4,0,12v36v24v48v' + svgOptions.firstBash + 'v12c0,6.6,5.4,12,12,12h46c6.6,0,12-5.4,12-12v0c0-6.6-5.4-12-12-12H28c-2.2,0-4-1.8-4-4v'+ svgOptions.secondBash +'c0-2.2,1.8-4,4-4h88c13.3,0,24-10.7,24-24v0c0-13.3-10.7-24-24-24H28c-2.2,0-4-1.8-4-4V52c0-2.2,1.8-4,4-4h88C129.3,48,140,37.3,140,24z'"/>
+      <g transform="translate(110,0)" :style="hasCdn ? 'display: block' : 'display: none'" class="extend-line">
+        <path class="st0 choice-path" d="M138,48H12C5.4,48,0,42.6,0,36V12C0,5.4,5.4,0,12,0l126,0c13.3,0,24,10.7,24,24v0C162,37.3,151.3,48,138,48z"	/>
+        <path class="st0 layer" transform="translate(-60,0.6) scale(0.98)" d="M138,48H12C5.4,48,0,42.6,0,36V12C0,5.4,5.4,0,12,0l126,0c13.3,0,24,10.7,24,24v0C162,37.3,151.3,48,138,48z"	/>
+      </g>
       <text transform="matrix(1 0 0 1 24.3335 30.3763)" class="st1 st2 st3">如果</text>
       <text :transform="'matrix(1 0 0 1 24.3335 ' + svgOptions.textBash + ')'" class="st1 st2 st3 else">否则</text>
       <polygon class="st4" :style="hasCdn ? 'display: none' : 'display: block'" points="106,12.3 82,12.3 70,25.3 82,38.3 106,38.3 118,25.3 	"/>
-      <g transform="translate(110,0)" :style="hasCdn ? 'display: block' : 'display: none'" class="extend-line">
-        <path class="st0" d="M138,48H12C5.4,48,0,42.6,0,36V12C0,5.4,5.4,0,12,0l126,0c13.3,0,24,10.7,24,24v0C162,37.3,151.3,48,138,48z"	/>
-      </g>
+      
     </g>
     <noRefFunc
       v-for="item in $data.contain.noRefFunc"
@@ -144,4 +147,12 @@ export default {
 	.st2{font-family:'MicrosoftYaHei';}
 	.st3{font-size:18px;}
 	.st4{fill:#1B8F8F;}
+  .st12 {
+  stroke-width: 4px;
+  stroke: yellow;
+}
+.layer {
+  stroke: none;
+  stroke-width: 0;
+}
 </style>

@@ -119,7 +119,7 @@ export function nestJudgeOperate(target, conTarget, list, isIf) {
 
     item.svgOptions = {
       firstBash: nextFirstBash,
-      secondBash: nextSecondBash,
+      secondBash: secondBash,
       textBash,
       firstTime,
       currentY: nextY,
@@ -139,12 +139,6 @@ export function nestJudgeOperate(target, conTarget, list, isIf) {
     //           + judgeOption.secondHalf
     //           + nextSecondBash    // 这里需要加之前的第二个基础，因为在if中插入的时候并不会影响第二个
     //           + judgeOption.lastHalf;
-
-    item.svgOptions = {
-      firstBash: nextFirstBash,
-      secondBash: nextSecondBash,
-      textBash: textBash
-    }
 
     for (let i = 0; i < list[type].length; i++) {
       if (list[type][i].id == id) {

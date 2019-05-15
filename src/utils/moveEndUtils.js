@@ -1,6 +1,8 @@
 import { getTransform, getTypeAndID, getTotalPosi, setTransform } from './shared/utils.js'
 import { findList, renewList, findConCspList } from './shared/listUtils.js'
 import { adjustOperate, nestOperate, spiltOperate } from './svgOperate/drag.js'
+import { isSvgContainer } from './shared/typeCheck'
+
 
 /**
  * @description 更改积木块的位置函数
@@ -11,12 +13,12 @@ export function changeSvgPosi(target) {
   
   // 分为最外层容器和不是最外层容器进行分别
   if (conList == this.$store.state.canvasList) {
-    renewList(conList, target);  // 单纯的更新列表
+    // renewList(conList, target);  // 单纯的更新列表
   } else {
     adjustOperate.call(this, target, $(target).parent()[0], conList);
-    setTimeout(() => {
-      renewList(conList, target);
-    }, 0);
+    // setTimeout(() => {
+    //   renewList(conList, target);
+    // }, 0);
   }
 }
 
@@ -53,4 +55,32 @@ export function changeSvgNest(target, crashResult, event) {
       adjustOperate.call(this, target, conTarget, fromList);  // 进行调整原本容器的操作,当这个父容器是底层的话是不需要进行修改的
     }
   }
+}
+
+/**
+ * @description 上传时候的处理，先处理视图，再处理choiceTarget
+ * @param {} target 
+ */
+export function choiceUpdate(target) {
+  while ($(target).parent()[0].getAttribute('id') !== 'main-svg-container') {
+    target = $(target).parent()[0];
+  }
+  if (!isSvgContainer(target)) {
+    return ;
+  }
+  if (this.$store.state.choiceTarget != null) {
+    let rootList = this.$store.state.canvasList;
+    for (let i = 0; i < rootList.circle.length; i++) {
+     $('#' + rootList.circle[i].id)[0].getElementsByClassName('choice-path')[0].style.stroke = 'rgba(0, 0, 0, .3)'
+     $('#' + rootList.circle[i].id)[0].getElementsByClassName('choice-path')[1].style.stroke = 'rgba(0, 0, 0, .3)'
+    }
+    for (let i = 0; i < rootList.judge.length; i++) {
+      $('#' + rootList.judge[i].id)[0].getElementsByClassName('choice-path')[0].style.stroke = 'rgba(0, 0, 0, .3)'
+      $('#' + rootList.judge[i].id)[0].getElementsByClassName('choice-path')[1].style.stroke = 'rgba(0, 0, 0, .3)'
+    }
+    
+  }
+  target.getElementsByClassName('choice-path')[0].style.stroke = 'yellow';
+  target.getElementsByClassName('choice-path')[1].style.stroke = 'yellow';
+  this.$store.state.choiceTarget = target;
 }

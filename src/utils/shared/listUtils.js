@@ -38,6 +38,9 @@ export function renewAllList(list) {
   let keys = Object.keys(list);
 
   for (let i = 0; i < keys.length; i++) {
+    if (svgComponentOption.indexOf(keys[i]) == -1) {
+      continue;
+    }
     for (let j = 0; j < list[keys[i]].length; j++) {
       let target = $('#' + list[keys[i]][j].id)[0],
           { width, height } = getSvgWH(target),
@@ -238,7 +241,9 @@ export function componentListMixin(conObj) {
 export function listPush(list, type, item) {
   if (type == 'circle' || type == 'judge') {
     // 如果是判断语句或者选择语句，需要特殊照顾
-    item.contain = [];
+    item.contain = {
+      // shadow: null  //这句shadow是要做阴影时候用的，现在不需要用到
+    };
     item.hasCdn = false;
     list[type].push(item);
   } else {
@@ -269,6 +274,9 @@ export function adjustList(list, conID) {
       keys = Object.keys(list);
 
   for (let i = 0; i < keys.length; i++) {
+    if (svgComponentOption.indexOf(keys[i]) == -1) {
+      continue;
+    }
     for (let j = 0; j < list[keys[i]].length; j++) {
       if (list[keys[i]][j].contain) {
         // 如果有的话，递归遍历这个容器

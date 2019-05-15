@@ -67,9 +67,15 @@
 
 <script>
 import PubSub from 'pubsub-js'
+import { formatData } from '../../utils/shared/model.js'
+import { findItem } from '../../utils/shared/listUtils.js'
 export default {
   mounted() {
     let token = PubSub.subscribe('update', (e, data) => {
+      
+      let item = findItem(this.$store.state.choiceTarget, this.$store.state.canvasList);
+      let result = formatData(item);
+      console.log(JSON.stringify(result))
       PubSub.unsubscribe(token);
     })
   },

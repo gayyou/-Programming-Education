@@ -31,7 +31,7 @@
 <script>
 import { eventMixin, initMixin, createModelMixin } from '../../../utils/mixin.js'
 export default {
-  props: ['value', 'model', 'y', 'x', 'id'],
+  props: ['value', 'model', 'y', 'x', 'id', 'func'],
   mounted() {
     if (this.model) {
       createModelMixin.call(this)

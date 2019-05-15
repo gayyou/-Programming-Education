@@ -1,6 +1,7 @@
-import { getTypeAndID, getTransform, insertSort, cloneSvgInfo, listHasTC, findItem } from '../shared/utils'
+import { getTypeAndID, getTransform, insertSort, cloneSvgInfo, listHasTC, findItem, getSvgWH } from '../shared/utils'
 import { cloneList } from '../shared/listUtils.js'
 import { isSvgContainer } from '../shared/typeCheck.js'
+import { whileOption, judgeOption } from './options'
 
 /**
  * @author Weybn
@@ -58,7 +59,6 @@ export function toContainer(target, crashTarget, fromList, toList) {
 export function adjustSvgPosi(target, conList, options, conTarget) {
   let childList = [],
       { type, id } = getTypeAndID(target), 
-      { y } = getTransform(target),
       { type: conType } = getTypeAndID(conTarget),
       keys = Object.keys(conList);
 
@@ -74,9 +74,28 @@ export function adjustSvgPosi(target, conList, options, conTarget) {
 
   // 获得所有子节点
   for (let i = 0; i < keys.length; i++) {
+    if (keys[i] == 'shadow') {
+      if (conList[keys[i]] == null) {
+        continue;
+      }
+      let shadowKey = Object.keys(conList[keys[i]])[0];
+      if (conList[keys[i]]) {
+        let shadow = $('#' + shadowKey + 'Sha')[0];
+        let { height, width } = getSvgWH(shadow);
+        childList.push({
+          y: conList[keys[i]][shadowKey].y,
+          height,
+          width,
+          x: 24
+        })
+      }
+      continue;
+    }
     for (let j = 0; j < conList[keys[i]].length; j++) {
       if (conList[keys[i]][j].id == id && conList[keys[i]][j].type != 'condition') {
         // 正在移动的目标还没有进行更新视图层，所以要获得当前相对于容器的位置
+        let { y } = getTransform(target);
+            
         conList[keys[i]][j].y = y;
       }
       childList.push(conList[keys[i]][j]);
@@ -86,7 +105,57 @@ export function adjustSvgPosi(target, conList, options, conTarget) {
   insertSort(childList); // 排序
 
   if (conType == 'judge') {
-    // payload有东西，说明是judge的调整
+    adjustJudge.call(this, childList, conTarget, options)
+  } else {
+    // 对circle的调整
+    adjustWhile.call(this, childList, conTarget, options);
+  }
+}
+
+export function addShadow(conTarget, conList) {
+  let keys = Object.keys(conList),
+      childList = [],
+      options = null,
+      { id: conID, type: conType } = getTypeAndID(conTarget);
+
+  switch(conType) {
+    case 'circle': {
+      options = whileOption; 
+      break;
+    }
+    
+    case 'judge': {
+      options = judgeOption;
+      break;
+    }
+  }
+
+  for (let i = 0; i < keys.length; i++) {
+    if (keys[i] == 'shadow') {
+      if (conList[keys[i]] == null) {
+        continue;
+      }
+      let shadowKey = Object.keys(conList[keys[i]])[0];
+      if (conList[keys[i]]) {
+        let shadow = $('#' + shadowKey + 'Sha')[0];
+        let { height, width } = getSvgWH(shadow);
+        childList.push({
+          y: conList[keys[i]][shadowKey].y,
+          height,
+          width,
+          x: 24
+        })
+      }
+      continue;
+    }
+    for (let j = 0; j < conList[keys[i]].length; j++) {
+      childList.push(conList[keys[i]][j]);
+    }
+  }
+
+  insertSort(childList); // 排序
+
+  if (conType == 'judge') {
     adjustJudge.call(this, childList, conTarget, options)
   } else {
     // 对circle的调整

@@ -24,7 +24,7 @@ export default {
   components: {
     noRefFunc
   },
-  props: ['model', 'value', 'y', 'x', 'id'],
+  props: ['model', 'value', 'y', 'x', 'id', 'func'],
   mounted() {
     if (this.model) {
       createModelMixin.call(this)

@@ -1,8 +1,8 @@
 import { nestWhileOperate, nestJudgeOperate, splitWhileOperate, splitJudgeOperate, splitConditionOperae } from './changeSvgContainer.js'
-import { getTransform, getTypeAndID, setTransform, getPathAttr, setPathAttr, cloneSvgInfo } from '../shared/utils'
+import { getTransform, getTypeAndID, getTotalPosi, setTransform, getPathAttr, setPathAttr, cloneSvgInfo } from '../shared/utils'
 import { whileOption, judgeOption } from './options'
 import { adjustSvgPosi, toContainer } from './domOperate.js'
-import { cloneList, findList, deleteFromList, renewList, renewAllList } from '../shared/listUtils'
+import { cloneList, findList, findItem, deleteFromList, renewList, renewAllList } from '../shared/listUtils'
 import { svgComponentOption } from '../shared/model.js'
 
 /**
@@ -35,7 +35,7 @@ export function nestOperate(target, crashResult) {
       setTimeout(() => {
         let target = $('#' + id)[0];
         adjustOperate.call(this, target, crashResult.container, conTargetList.contain);
-      })
+      }, 0)
       break;
     }
     case 'judge': {
@@ -60,7 +60,7 @@ export function nestOperate(target, crashResult) {
         let {x: conX, y: conY} = getTransform(crashResult.container);
         if (type != 'condition') {
           // condition不参与
-          target.setAttribute('transform', 'translate(' + (x - conX) + ', ' + (y - conY) + ')');  // 确定放在if或者else
+          target.setAttribute('transform', 'translate(-500, ' + (y - conY) + ')');  // 确定放在if或者else，因为放在if或者else是根据对于在“否则”语句位置
         }
         // this.$store.state.isRenew = !this.$store.state.isRenew;
         adjustOperate.call(this, target, crashResult.container, conTargetList.contain);
@@ -101,7 +101,6 @@ export function nestOperate(target, crashResult) {
 export function spiltOperate(target, conTarget, mousePayload) {
   let { id: id, type: type } = getTypeAndID(target),
       { id: conID, type: conType } = getTypeAndID(conTarget),
-      { x: bashX, y: bashY } = getTransform(conTarget),
       fromList = findList(target, this.$store.state.canvasList),
       toList = this.$store.state.canvasList;  // 设置为根的原因就是只有移动到根容器中才会进行分裂
 
@@ -127,12 +126,18 @@ export function spiltOperate(target, conTarget, mousePayload) {
   for (let i = 0; i < fromList[type].length; i++) {
     if (fromList[type][i].id === id) {
       let temp = fromList[type][i];
+      let { x: bashX, y: bashY } = getTotalPosi(conTarget, this.$store.state.canvasList);
       temp.x = bashX + temp.x + mouseDisX;
       temp.y = bashY + temp.y + mouseDisY;
-      setTransform(target, {
-        x: temp.x,
-        y: temp.y
-      });
+      // setTransform(target, {
+      //   x: temp.x,
+      //   y: temp.y
+      // });
+
+      let item = findItem(target, this.$store.state.canvasList);  // 更新拉出来的块的位置
+      item.x = temp.x;
+      item.y = temp.y;
+      
 
       let containParam = null;  // 如果拉出去的是容器的话，会对新渲染出来的容器进行改变
       // 这里是改变列表中的位置
@@ -149,6 +154,8 @@ export function spiltOperate(target, conTarget, mousePayload) {
       //   }
       //   renewList(this.$store.state.canvasList, conTarget);  // 更新容器列表
       // }, 1)
+
+      break;
     }
   }
 }
@@ -163,7 +170,6 @@ export function spiltOperate(target, conTarget, mousePayload) {
  */
 export function adjustOperate(target, conTarget, conList) {
   let conType = getTypeAndID(conTarget).type;
-  console.log('进行调整')
   switch(conType) {
     case 'circle': {
       adjustSvgPosi.call(this, target, conList, whileOption, conTarget);
@@ -177,8 +183,11 @@ export function adjustOperate(target, conTarget, conList) {
   }
 
   // 从里至外进行调整容器的大小
+  target = conTarget;
   conTarget = $(conTarget).parent()[0];
-  target = $(target).parent()[0];
+
+  let { id } = getTypeAndID(target);
+  let { id: conID } = getTypeAndID(conTarget);
   if (conTarget.getAttribute('id') !== 'main-svg-container') {
     conList = findList(target, this.$store.state.canvasList);
   } else {
@@ -189,6 +198,8 @@ export function adjustOperate(target, conTarget, conList) {
     setTimeout(() => {
       renewAllList(this.$store.state.canvasList);
       setTimeout(() => {
+        conTarget = $('#' + conID)[0];
+        target = $('#' + id)[0];
         this.$store.state.isRenew = !this.$store.state.isRenew;  // 更新时机很重要
         adjustOperate.call(this, target, conTarget, conList);
       }, 0)
