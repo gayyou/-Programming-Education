@@ -2,10 +2,10 @@
   <div class="float-layer" 
     v-if="$store.state.showLogin || $store.state.showRegist || $store.state.showConfirm || $store.state.showMessage"
   >
-    <login v-if="$store.state.showLogin" :message="$data.message"></login>
-    <regist v-if="$store.state.showRegist" :message="$data.message"></regist>
+    <login v-if="$store.state.showLogin"></login>
+    <regist v-if="$store.state.showRegist" ></regist>
     <confirm-layer v-if="$store.state.showConfirm"></confirm-layer>
-    <message v-if="$store.state.showMessage" :message="$data.message"></message>
+    <message v-if="$store.state.showMessage" ></message>
   </div>  
 </template>
 

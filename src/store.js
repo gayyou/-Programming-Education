@@ -5,6 +5,10 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    userID: null,
+    userName: null,
+    name: null,
+    userHeadImg: null,
     isStart: true,
     isRenew: false,
     point: '',
@@ -15,8 +19,14 @@ export default new Vuex.Store({
     showRegist: false,
     showConfirm: false,
     showMessage: false,
+    message: '',
     isLogin: false,
-    isInput: null,
+    isInput: {
+      type: null,
+      id: null,
+      index: null,
+      value: 0
+    },
     isCode: true,
     elCount: 0,
     comCount: 0,
@@ -56,7 +66,8 @@ export default new Vuex.Store({
     // 下面是推荐模式所独有的store
 
     // 1是按照最新发布排序  2 是按照最快上升排序  3 是按照评分高的排序
-    sortOrder: 1
+    sortOrder: 1,
+
   },
   mutations: {
 

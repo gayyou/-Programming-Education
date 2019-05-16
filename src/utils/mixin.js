@@ -3,6 +3,7 @@ import { getTransform, getTypeAndID, getSvgWH } from './shared/utils'
 import { isSvgContainer } from './shared/typeCheck'
 import { renewWhileOption, renewJudgeOption } from './svgOperate/options'
 import { choiceUpdate } from './moveEndUtils'
+import { hideGlobalInput } from './shared/changeTextUtils'
 
 /**
  * @description 混入模式，将这个可移动的组件添加一个点击事件,点击将全局的拖拽对象moveTarget赋值为这个组件
@@ -20,6 +21,8 @@ export function eventMixin(that) {
     initContainInfo(that);
     setMouseDownInit(event, that);
     choiceUpdate.call(that, that.$el);
+    // 隐藏输入框
+    hideGlobalInput();
   }
 }
 
@@ -102,9 +105,11 @@ export function createModelMixin() {
     listPush.bind(this)(list, type, newItem);
 
     setTimeout(() => {
+      console.log(type);
       let fakeTarget = $('#fake-' + type)[0];
       console.log('fake',fakeTarget)
       let targetList = $('#main-svg-container>.' + type);
+      console.log(targetList[0])
 
       // 设置鼠标初始化
       setMouseDownInit(event, this);

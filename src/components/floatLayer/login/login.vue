@@ -54,22 +54,29 @@ export default {
         password: this.$data.password
       })
       .then((res) => {
-        res = JSON.parse(res);
-        switch(res.code) {
+        let data = res.data;
+        switch(data.code) {
           case '200': {
-            if (res.data) {
+            if (data.data) {
+              this.$store.state.message = '登陆成功'
+              this.$store.state.userID = data.data.id;
+              this.$store.state.userName = data.data.userName;
+              this.$store.state.name = data.data.name;
+              this.$store.state.isLogin = true;
+              this.$store.state.showLogin = false;
               // 登陆成功
             } else {
-              this.$emit('message', '登陆失败,请检测账号和密码')
+              this.$store.state.message = '登陆失败,请检查你的账号和密码'
               // 登陆失败
             }
             break;
           }
           case '500': {
-            this.$emit('message', '请求失败，请检查你的网络状况')
+            this.$store.state.message = '服务器出现异常'
             break;
           }
         }
+        this.$store.state.showMessage = true;
       })
       .catch((err) => {
         throw new Error(err);

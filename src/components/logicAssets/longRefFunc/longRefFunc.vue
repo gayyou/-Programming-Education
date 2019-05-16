@@ -8,9 +8,13 @@
     <path class="st0" d="M224,48H4c-2.2,0-4-1.8-4-4V4c0-2.2,1.8-4,4-4h220c13.3,0,24,10.7,24,24v0C248,37.3,237.3,48,224,48z"/>
     <text transform="matrix(1 0 0 1 21.2505 29.4182)" class="st1 st2 st3">{{ value[0][0] }}</text>
     <text transform="matrix(1 0 0 1 93.5838 29.4178)" class="st1 st2 st3">{{ value[0][1] }}</text>
-    <path class="st1" d="M72.9,37h-14c-7.1,0-13-5.8-13-13v0c0-7.1,5.8-13,13-13h14c7.1,0,13,5.8,13,13v0C85.9,31.2,80.1,37,72.9,37z"
-      />
+    <path class="st1" transform="translate(0,0)" d="M72.9,37h-14c-7.1,0-13-5.8-13-13v0c0-7.1,5.8-13,13-13h14c7.1,0,13,5.8,13,13v0C85.9,31.2,80.1,37,72.9,37z"
+      @click="textInput"
+      data-index="0"  
+    />
     <text
+    @click="numberInput"
+    data-index="0"  
     transform="translate(78,30)"
     class="text cls-2"
     id="毫秒"
@@ -24,6 +28,7 @@
 </template>
 
 <script>
+import { changeInput } from '../../../utils/shared/changeTextUtils.js'
 import { eventMixin, initMixin, createModelMixin } from '../../../utils/mixin.js'
 export default {
   props: ['model', 'value', 'y', 'x', 'id', 'func'],
@@ -32,6 +37,21 @@ export default {
       createModelMixin.call(this)
     } else {
       eventMixin(this);
+    }
+  },
+  methods: {
+    textInput(event) {
+      // 下面这两个没什么区别，区别主要是点击的不同，设置两个的原因是这两个东西其实不是嵌套的,不知道叫做什么，乱写名字，后期改
+      changeInput.call(this, event, {
+        x: -50,
+        y: -13.5
+      });
+    },
+    numberInput(event) {
+      changeInput.call(this, event, {
+        x: -89,
+        y: 16.5
+      });
     }
   }
 }

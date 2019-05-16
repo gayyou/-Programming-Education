@@ -57,32 +57,38 @@ export default {
         return ;
       }
 
-      this.axios
+      this.$http
       .post('/user/register', {
         userName: this.$data.account,
         password: this.$data.password,
         name: this.$data.name
       })
       .then((res) => {
-        res = JSON.parse(res);
-        switch(res.code) {
+        let data = res.data;
+        
+        switch(data.code) {
           case '200': {
-            if (res.data) {
+            if (data.data) {
               // 登陆成功
+              this.$store.state.message = '注册成功'
             } else {
-              this.$emit('message', '登陆失败,请检测账号和密码')
+              // this.$emit('message', '登陆失败,请检测账号和密码')
+              this.$store.state.message = '注册失败,账号已经注册'
               // 登陆失败
             }
             break;
           }
           case '500': {
             this.$emit('message', '请求失败，请检查你的网络状况')
+            this.$store.state.message = '请求失败，请检查你的网络状况'
             break;
           }
         }
+        this.$store.state.showMessage = true;
       })
       .catch((err) => {
         throw new Error(err);
+        // console.log('异常了')
       })
     }
   },

@@ -2,11 +2,11 @@
   <div class="drag-container" id="container"
     @mousemove="dragMove"
     @mouseup="dragEnd"
-    @mousedown="dragStart"
   >
     <div class="renew" style="display:none" v-if="$store.state.isRenew"></div>
 
     <svg
+      @click="dragStart"
       xmlns:dc="http://purl.org/dc/elements/1.1/"
       xmlns:cc="http://creativecommons.org/ns#"
       xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -120,6 +120,33 @@
         :value="item.value"
         :model="false"
       ></order>
+      <doubleRef
+        v-for=" item in $store.state.canvasList.doubleRef"
+        :key="item.id"
+        :y="item.y"
+        :x="item.x"
+        :id="item.id"
+        :value="item.value"
+        :model="false"
+      ></doubleRef>
+      <longRefFunc
+        v-for=" item in $store.state.canvasList.longRefFunc"
+        :key="item.id"
+        :y="item.y"
+        :x="item.x"
+        :id="item.id"
+        :value="item.value"
+        :model="false"
+      ></longRefFunc>
+      <longRightRef
+        v-for=" item in $store.state.canvasList.longRightRef"
+        :key="item.id"
+        :y="item.y"
+        :x="item.x"
+        :id="item.id"
+        :value="item.value"
+        :model="false"
+      ></longRightRef>
     </svg>
 
     <svg xmlns="http://www.w3.org/2000/svg" width="3.66rem" height="100%" id="model-container"
@@ -134,7 +161,7 @@
         :value="'向前移动'"
         :y="40"
       ></noRefFunc> -->
-      <noRefFunc
+      <!-- <noRefFunc
         :model="true"
         :value="'向左转'"
         :y="40"
@@ -151,32 +178,74 @@
         :value="'向后转'"
         :y="180"
         :x="20"
-      ></noRefFunc>
-      <order
+      ></noRefFunc> -->
+      <doubleRef
         :model="true"
-        :value="['向前', '步', 1]"
+        :value="[['向前移动', '速度', '秒'], [0, 0]]"
+        :y="40"
+        :x="20"
+        :func="'move_ahead'"
+      ></doubleRef>
+      <doubleRef
+        :model="true"
+        :value="[['向后移动', '速度', '秒'], [0, 0]]"
+        :y="110"
+        :x="20"
+        :func="'move_behind'"
+      ></doubleRef>
+      <doubleRef
+        :model="true"
+        :value="[['向左移动', '速度', '秒'], [0, 0]]"
+        :y="180"
+        :x="20"
+        :func="'move_left'"
+      ></doubleRef>
+      <doubleRef
+        :model="true"
+        :value="[['向右移动', '速度', '秒'], [0, 0]]"
+        :y="250"
+        :x="20"
+        :func="'move_right'"
+      ></doubleRef>
+      <longRefFunc
+        :model="true"
+        :value="[['将', '引脚置为高电平'], [0]]"
+        :y="320"
+        :x="20"
+        :func="'set_height'"
+      ></longRefFunc>
+      <longRefFunc
+        :model="true"
+        :value="[['将', '引脚置为低电平'], [0]]"
+        :y="390"
+        :x="20"
+        :func="'set_low'"
+      ></longRefFunc>
+      <!-- <order
+        :model="true"
+        :value="[['向前', '步'], [1]]"
         :y="250"
         :x="20"
       ></order>
       <order
         :model="true"
-        :value="['向后', '步', 1]"
+        :value="[['向后', '步'], [1]]"
         :y="320"
         :x="20"
       ></order>
       <order
         :model="true"
-        :value="['向左', '步', 1]"
+        :value="[['向左', '步'], [1]]"
         :y="390"
         :x="20"
-      ></order>
+      ></order> -->
       <!-- <order
         :model="true"
         :value="['向右', '步', 1]"
         :y="460"
         :x="20"
       ></order> -->
-      <longRefFunc
+      <!-- <longRefFunc
         :model="true"
         :value="[['将', '引脚置为低电平'], [1]]"
         :y="460"
@@ -187,7 +256,7 @@
         :value="[['向前移动', '速度', '秒'], [20, 30]]"
         :y="530"
         :x="20"
-      ></doubleRef>
+      ></doubleRef> -->
       <noRefFunc
         id="fake-noRefFunc"
         v-if="$store.state.model.type === 'noRefFunc'"
@@ -214,7 +283,7 @@
       ></doubleRef>
       <longRefFunc
         id="fake-longRefFunc"
-        v-if="$store.state.model.type === 'doubleRefFunc'"
+        v-if="$store.state.model.type === 'longRefFunc'"
         :model="true"
         :value="$store.state.model.value"
         :y="$store.state.model.y"
@@ -337,8 +406,6 @@
         :y="440"
         :x="20"
       ></condition>
-
-
       <condition
         id="fake-condition"
         v-if="$store.state.model.type === 'condition'"
@@ -356,7 +423,7 @@
       <g transform="translate(12,0)" display="block" id="move-operate">
         <text class="operate-title" x="20" y="20" text-anchor="middle" dominant-baseline="central" dy="0">辅助</text>
       </g>
-      <assist
+      <!-- <assist
         :model="true"
         :value="'抬起机械臂'"
         :y="40"
@@ -367,26 +434,62 @@
         :value="'放下机械臂'"
         :y="110"
         :x="20"
-      ></assist>
+      ></assist> -->
       <assist
         :model="true"
         :value="'合并机械臂'"
-        :y="180"
+        :y="40"
         :x="20"
         :func="'close_arm'"
       ></assist>
       <assist
         :model="true"
         :value="'松开机械臂'"
-        :y="250"
+        :y="110"
         :x="20"
         :func="'open_arm'"
       ></assist>
       <longRightRef
         :model="true"
-        :value="[['机械上臂向上摆动', '度'], [20]]"
+        :value="[['机械上臂向上摆动', '度'], [0]]"
+        :y="180"
+        :x="20"
+        :func="'move_arm_high_up'"
+      ></longRightRef>
+      <longRightRef
+        :model="true"
+        :value="[['机械上臂向下摆动', '度'], [0]]"
+        :y="250"
+        :x="20"
+        :func="'move_arm_high_down'"
+      ></longRightRef>
+      <longRightRef
+        :model="true"
+        :value="[['机械下臂向上摆动', '度'], [0]]"
         :y="320"
         :x="20"
+        :func="'move_arm_low_up'"
+      ></longRightRef>
+      <longRightRef
+        :model="true"
+        :value="[['机械下臂向下摆动', '度'], [0]]"
+        :y="390"
+        :x="20"
+        :func="'move_arm_low_down'"
+      ></longRightRef>
+      <longRightRef
+        :model="true"
+        :value="[['机械上臂向左转动', '度'], [0]]"
+        :y="460"
+        :x="20"
+        :func="'move_arm_left'"
+      ></longRightRef>
+      <longRightRef
+        :model="true"
+        :value="[['机械上臂向右转动', '度'], [0]]"
+        :y="530"
+        :x="20"
+        :func="'move_arm_right'"
       ></longRightRef>
       <assist
         id="fake-assist"
@@ -407,7 +510,7 @@
     </svg>
 
     <div class="global-input">
-      <input type="text" @input="inputs">
+      <input :value="$store.state.isInput.value" type="text" @input="inputs">
     </div>
   </div>
 </template>
@@ -432,6 +535,7 @@ import { adjustOperate } from '../../utils/svgOperate/drag.js'
 import { isSvgContainer } from '../../utils/shared/typeCheck.js'
 import { changeSvgNest, changeSvgPosi, choiceUpdate } from '../../utils/moveEndUtils.js'
 import { addShadow } from '../../utils/svgOperate/domOperate.js'
+import { hideGlobalInput } from '../../utils/shared/changeTextUtils'
 
 export default {
   components: {
@@ -462,7 +566,7 @@ export default {
   },
   methods: {
     dragStart(event) {
-      
+      hideGlobalInput()
     },
     dragMove(event) {
       if (!this.$store.state.moveTarget) {
@@ -580,15 +684,26 @@ export default {
       }
     },
     inputs(event) {
+      event.stopPropagation();
       let type = this.$store.state.isInput.type;
       let id = this.$store.state.isInput.id;
-      let list = this.$store.state.canvasList;
-      for (let i = 0; i < list[type].length; i++) {
-        if (id == list[type][i].id) {
-          list[type][i].value[2] = $('.global-input input')[0].value;
-        }
-      }
-      // this.$store.state.isInput.firstChild.nodeValue = $('.global-input input')[0].value;
+      let index = this.$store.state.isInput.index;
+      // let list = this.$store.state.canvasList;
+      console.log($('#' + id)[0])
+      let target = $('#' + id)[0];
+      let item = findItem(target, this.$store.state.canvasList);
+      console.log(item);
+      // let newArr = [];
+      item.value[1][index] = parseInt($('.global-input input')[0].value);
+      // item.value[1].push('');
+      // item.value[1].pop();
+      // this.$store.state.isRenew = !this.$store.state.isRenew
+      // for (let i = 0; i < list[type].length; i++) {
+      //   if (id == list[type][i].id) {
+      //     list[type][i].value[index] = $('.global-input input')[0].value;
+      //   }
+      // }
+      target.getElementsByClassName('text')[index].firstChild.nodeValue = $('.global-input input')[0].value;
     }
   },
 }
@@ -603,6 +718,7 @@ export default {
   height: 0.26rem;
 
   input {
+    font-family: 'MicrosoftYaHei'!important;
     width: 100%;
     height: 100%;
     text-align: center;

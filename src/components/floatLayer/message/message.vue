@@ -4,7 +4,7 @@
       <span>提示</span>
     </div>
     <div class="prompt-value">
-      <span>{{ message }}</span>
+      <span>{{ $store.state.message }}</span>
     </div>
     <div class="prompt-choice">
       <button class="prompt-confirm" @click="isRead">确定</button>
@@ -14,7 +14,6 @@
 
 <script>
 export default {
-  props: ['message'],
   data() {
     return {
       isAnimate: false

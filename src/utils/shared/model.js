@@ -56,28 +56,54 @@ export const funcName = {
   ]
 }
 
+function getJudgeStn(item) {
+  let cutLineY = item.svgOptions.textBash,
+      { contain } = item,
+      keys = Object.keys(contain),
+      ifResult = null, elseResult = null;
 
+  for (let i = 0; i < keys.length; i++) {
+    for (let j = 0; j < contain[keys[i]].length; j++) {
+      if (contain[keys[i]][j].y <= cutLineY) {
 
-// export class CodeData {
-//   constructor(targetItem) {
-//     this.data = new CodeItem(targetItem, 1);
-//   }
-// }
+      } else {
+
+      }
+    }
+  }
+
+  
+}
+
+function getWhileStn(item) {
+
+}
+
+function getSentence(item) {
+  let { type } = item,
+      resultData = {};
+
+  switch(type) {
+    case 'judge': {
+      resultData = getJudgeStn(item);
+      break;
+    }
+    
+    case 'while': {
+      resultData = getWhileStn(item);
+      break;
+    }
+
+    default: {
+      
+    }
+  }
+}
 
 export function formatData(targetItem) {
   return codeItem(targetItem, 1);
 }
 
-// class CodeList {
-//   constructor(list, nestLevel) {
-//     this.data = []
-//     svgComponentOption.forEach((value) => {
-//       for (let i = 0; i < list[value].length; i++) {
-//         this.data.push(new CodeItem(list[value][i], nestLevel));
-//       }
-//     })
-//   }
-// }
 
 function codeList(list, nestLevel) {
   let data = [];
@@ -91,23 +117,22 @@ function codeList(list, nestLevel) {
   return data;
 }
 
-// class CodeItem {
-//   constructor(item, nestLevel) {
-//     this.data = {
-//       type: item.type,
-//       tab: nestLevel,
-//       ops: item.func,
-//       condition: null,
-//       children: item.contain ? new CodeList(item.contain, nestLevel + 1) : null
-//     }
-//   }
-// }
-
 function codeItem(item, nestLevel) {
+  let argsStr = '';
+
+  if (item.value[1]) {
+    for (let i = 0; i < item.value[1].length; i++) {
+      argsStr += item.value[1][i];
+      if (i < item.value[1].length - 1) {
+        argsStr += ','
+      }
+    }
+  }
+
   return {
     type: item.type,
     tab: nestLevel,
-    ops: item.func,
+    ops: item.func ? item.func + '(' + argsStr + ')' : null,
     condition: null,
     children: item.contain ? codeList(item.contain, nestLevel + 1) : null
   }

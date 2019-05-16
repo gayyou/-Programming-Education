@@ -75,6 +75,33 @@
       :id="item.id"
       :value="item.value"
     ></order>
+    <doubleRef
+      v-for=" item in $data.contain.doubleRef"
+      :key="item.id"
+      :y="item.y"
+      :x="item.x"
+      :id="item.id"
+      :value="item.value"
+      :model="false"
+    ></doubleRef>
+    <longRefFunc
+      v-for=" item in $data.contain.longRefFunc"
+      :key="item.id"
+      :y="item.y"
+      :x="item.x"
+      :id="item.id"
+      :value="item.value"
+      :model="false"
+    ></longRefFunc>
+    <longRightRef
+      v-for=" item in $data.contain.longRightRef"
+      :key="item.id"
+      :y="item.y"
+      :x="item.x"
+      :id="item.id"
+      :value="item.value"
+      :model="false"
+    ></longRightRef>
     <div v-if="$store.state.isRenew"></div>
   </g>
 </template>
@@ -90,6 +117,9 @@ import assist from '../assist/assist.vue'
 import order from '../order/order.vue'
 import assistSha from '../assist/shadow/assist.vue'
 import circleSha from './shadow/circle.vue'
+import doubleRef from '../doubleRef/doubleRef.vue'
+import longRefFunc from '../longRefFunc/longRefFunc.vue'
+import longRightRef from '../longRightRef/longRightRef.vue'
 
 export default {
   name: 'circles',
@@ -102,7 +132,10 @@ export default {
     order,
     circles,
     assistSha,
-    circleSha
+    circleSha,
+    longRightRef,
+    longRefFunc,
+    doubleRef
   },
   data() {
     return {

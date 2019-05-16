@@ -6,11 +6,14 @@ import 'element-ui/lib/theme-chalk/index.css';
 import axios from 'axios';
 
 Vue.use(ElementUI);
-Vue.prototype.$http = axios
-// Vue.prototype.$ajax = axios;
+
 axios.defaults.timeout = 5000;
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
-axios.defaults.baseURL = 'http://127.130.1484:8089/';
+axios.defaults.baseURL = 'http://www.benhefoodstuff.com:24567';
+Vue.prototype.$http = axios
+// Vue.prototype.$ajax = axios;
+
+console.log(axios)
 
 Vue.config.productionTip = false
 

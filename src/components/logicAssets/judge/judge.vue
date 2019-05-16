@@ -82,6 +82,33 @@
       :id="item.id"
       :value="item.value"
     ></order>
+    <doubleRef
+      v-for=" item in $data.contain.doubleRef"
+      :key="item.id"
+      :y="item.y"
+      :x="item.x"
+      :id="item.id"
+      :value="item.value"
+      :model="false"
+    ></doubleRef>
+    <longRefFunc
+      v-for=" item in $data.contain.longRefFunc"
+      :key="item.id"
+      :y="item.y"
+      :x="item.x"
+      :id="item.id"
+      :value="item.value"
+      :model="false"
+    ></longRefFunc>
+    <longRightRef
+      v-for=" item in $data.contain.longRightRef"
+      :key="item.id"
+      :y="item.y"
+      :x="item.x"
+      :id="item.id"
+      :value="item.value"
+      :model="false"
+    ></longRightRef>
     <div v-if="$store.state.isRenew"></div>
     <!-- <noRefFunc
       :model="false"
@@ -100,17 +127,23 @@ import judge from '../judge/judgeCpy.vue'
 import circles from '../circle/circleCpy.vue'
 import assist from '../assist/assist.vue'
 import order from '../order/order.vue'
+import doubleRef from '../doubleRef/doubleRef.vue'
+import longRefFunc from '../longRefFunc/longRefFunc.vue'
+import longRightRef from '../longRightRef/longRightRef.vue'
 
 export default {
-  name: 'judge',
-  props: ['model', 'y', 'value', 'containObject', 'x', 'id' , 'hasCdn', 'svgOptions'],
+  name: 'circles',
+  props: ['model', 'y', 'value', 'containObject', 'x', 'id', 'hasCdn', 'svgOptions'],
   components: {
     noRefFunc,
-    circles,
     condition,
     judge,
     assist,
-    order
+    order,
+    circles,
+    longRightRef,
+    longRefFunc,
+    doubleRef
   },
   data() {
     return {
