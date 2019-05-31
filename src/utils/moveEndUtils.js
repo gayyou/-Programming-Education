@@ -1,5 +1,5 @@
 import { getTransform, getTypeAndID, getTotalPosi, setTransform } from './shared/utils.js'
-import { findList, renewList, findConCspList } from './shared/listUtils.js'
+import { findList, renewList, findConCspList, findItem } from './shared/listUtils.js'
 import { adjustOperate, nestOperate, spiltOperate } from './svgOperate/drag.js'
 import { isSvgContainer } from './shared/typeCheck'
 
@@ -35,6 +35,8 @@ export function changeSvgNest(target, crashResult, event) {
     toConList = findConCspList(crashResult.container, this.$store.state.canvasList);  // 寻找想要到的容器目标所在列表的contain属性
   }
 
+  // remeberCdn.call(this, target, this.$store.state.canvasList);
+
   // 两种情况，一种是分裂，表现为分裂到根容器中，一种是嵌套，即从一个容器嵌套到另外一个容器或者从根目录嵌套
   if (toConList == this.$store.state.canvasList) {
     // 这个是分裂
@@ -52,7 +54,9 @@ export function changeSvgNest(target, crashResult, event) {
     nestOperate.call(this, target, crashResult);  // 进行嵌合操作
     // 接下来是改变原来容器的大小，进行调整并更新列表
     if (conTarget.getAttribute('id') !== 'main-svg-container') {
-      adjustOperate.call(this, target, conTarget, fromList);  // 进行调整原本容器的操作,当这个父容器是底层的话是不需要进行修改的
+      setTimeout(() => {
+        adjustOperate.call(this, target, conTarget, fromList);  // 进行调整原本容器的操作,当这个父容器是底层的话是不需要进行修改的
+      })
     }
   }
 }
@@ -65,6 +69,7 @@ export function choiceUpdate(target) {
   while ($(target).parent()[0].getAttribute('id') !== 'main-svg-container') {
     target = $(target).parent()[0];
   }
+  console.log(this)
   if (!isSvgContainer(target)) {
     return ;
   }
@@ -83,4 +88,19 @@ export function choiceUpdate(target) {
   target.getElementsByClassName('choice-path')[0].style.stroke = 'yellow';
   target.getElementsByClassName('choice-path')[1].style.stroke = 'yellow';
   this.$store.state.choiceTarget = target;
+}
+
+export function remeberCdn(target, rootList) {
+  let { id, type } = getTypeAndID(target);
+  if (type != 'condition') {
+    return ;
+  }
+  let item = findItem(target, rootList),
+      list = findList(target, rootList);
+
+  let temp = JSON.parse(JSON.stringify(item));
+  this.$store.state.cdnInfo = {
+    contain: list,
+    info: temp
+  }
 }

@@ -9,7 +9,7 @@ Vue.use(ElementUI);
 
 axios.defaults.timeout = 5000;
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
-axios.defaults.baseURL = 'http://www.benhefoodstuff.com:24567';
+axios.defaults.baseURL = 'http://qgstudio.org:11291';
 Vue.prototype.$http = axios
 // Vue.prototype.$ajax = axios;
 

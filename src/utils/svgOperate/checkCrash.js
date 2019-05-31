@@ -12,14 +12,102 @@ export function isCrash(target, rootList, payload) {
   let resData = null;
   resData = checkCrash(target, rootList, rootList, payload);
 
-  // console.log('resData', resData);
+  if (resData == null) {
+    let { type } = getTypeAndID(target);
+    if (type == 'condition') {
+      // 如果是判断语句的话，会比其他多一层判断
+      resData = checkCondition(target, rootList, rootList, payload);
+      
+    }
+  }
 
   return resData;
 }
 
-function checkCrash(target, list, rootList, beforeChangeSizeCon) {
+function checkCondition(target, list, rootList, beforeChangeSizeCon) {
   let { id: targetID } = getTypeAndID(target),
       { x: targetX, y: targetY } = getTotalPosi(target, rootList);
+
+  let tempX, tempY, tempW, tempH, tempID;
+  let xFlag, yFlag,
+      keys = Object.keys(list);
+
+      for (let i = 0; i < keys.length; i++) {
+        if (!isSvgContainer(keys[i])) {
+          // console.log('不是容器', keys[i])
+          // 不是容器的话，跳过
+          continue;
+        }
+    
+        for (let j = 0; j < list[keys[i]].length; j++) {
+          let item = list[keys[i]][j];
+    
+          if (item.id == targetID) {
+            continue;
+          }
+    
+          xFlag = 0;
+          yFlag = 0;
+    
+          tempW = item.width;
+          tempH = item.height;
+          tempID = item.id;
+    
+          if (list == rootList) {
+            // 区分碰撞的容器是否在根目录下，不在的话需要进行获取绝对坐标
+            tempX = item.x;
+            tempY = item.y;
+          } else {
+            let con = $('#' + tempID)[0];
+            let { x: conX, y: conY } = getTotalPosi(con, rootList);
+            tempX = conX;
+            tempY = conY;
+          }
+    
+          if (beforeChangeSizeCon && tempID == beforeChangeSizeCon.id && beforeChangeSizeCon.isUsed == false) {
+            tempW = beforeChangeSizeCon.width;
+            tempH = beforeChangeSizeCon.height;
+            beforeChangeSizeCon.isUsed = true;
+          }
+          
+          // console.log(targetX, tempX, tempW)
+          // console.log(targetY, tempY, tempH)
+
+          if (targetX - tempX > -30 && targetX - tempX < tempW) {
+            xFlag = 1;
+          }
+    
+          if (targetY - tempY > -30 && targetY - tempY < 48) {
+            yFlag = 1;
+          }
+    
+          if (yFlag == 1 && xFlag == 1) {
+            return {
+              container: $('#' + tempID)[0],
+              dirX: xFlag,
+              dirY: yFlag
+            }
+          }
+    
+          if (item.contain) {
+            // 递归遍历
+            let result = checkCondition(target, list[keys[i]][j].contain, rootList, beforeChangeSizeCon);
+    
+            if (result) {
+              return result;
+            }
+          }
+        }
+      }
+}
+
+function checkCrash(target, list, rootList, beforeChangeSizeCon) {
+  let { id: targetID, type } = getTypeAndID(target),
+      { x: targetX, y: targetY } = getTotalPosi(target, rootList);
+
+  if (type == 'condition') {
+    return null;
+  }
 
   let tempX, tempY, tempW, tempH, tempID;
   let xFlag, yFlag,
@@ -46,16 +134,12 @@ function checkCrash(target, list, rootList, beforeChangeSizeCon) {
       tempH = item.height;
       tempID = item.id;
 
-      if (list == rootList) {
-        // 区分碰撞的容器是否在根目录下，不在的话需要进行获取绝对坐标
-        tempX = item.x;
-        tempY = item.y;
-      } else {
-        let con = $('#' + tempID)[0];
-        let { x: conX, y: conY } = getTotalPosi(con, rootList);
-        tempX = conX;
-        tempY = conY;
-      }
+      
+      let con = $('#' + tempID)[0];
+      let { x: conX, y: conY } = getTotalPosi(con, rootList);
+      tempX = conX;
+      tempY = conY;
+      
 
       if (beforeChangeSizeCon && tempID == beforeChangeSizeCon.id && beforeChangeSizeCon.isUsed == false) {
         tempW = beforeChangeSizeCon.width;
@@ -68,10 +152,15 @@ function checkCrash(target, list, rootList, beforeChangeSizeCon) {
       }
 
       if (targetY - tempY > 0 && targetY - tempY < tempH) {
-        if (targetY - tempY < tempH / 2) {
-          yFlag = 0;
+        if (item.type == 'judge') {
+          // console.log()
+          if (targetY - tempY < item.svgOptions.textBash) {
+            yFlag = 0;  // 放在if中
+          } else {
+            yFlag = 1;  // 放在else中
+          }
         } else {
-          yFlag = 1;
+          yFlag = 0;
         }
       }
 

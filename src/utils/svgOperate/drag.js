@@ -38,6 +38,23 @@ export function nestOperate(target, crashResult) {
       }, 0)
       break;
     }
+
+    case 'inOrder': {
+      let conTargetList;
+
+      for (let i = 0; i < toList[conType].length; i++) {
+        if (conID == toList[conType][i].id) {
+          conTargetList = toList[conType][i];
+        }
+      }
+
+      nestWhileOperate.call(this, target, crashResult.container, fromList);
+      setTimeout(() => {
+        let target = $('#' + id)[0];
+        adjustOperate.call(this, target, crashResult.container, conTargetList.contain);
+      }, 0)
+      break;
+    }
     case 'judge': {
       // 这里会有一个bug，就是先在else语句中添加语句的话，继续添加的if语句中的块，会出差错，原因是else的块没有进行处理
       let conTargetList;
@@ -49,7 +66,7 @@ export function nestOperate(target, crashResult) {
         }
       }
 
-      if (crashResult.dirY == 1) {
+      if (crashResult.dirY == 0) {
         nestJudgeOperate.call(this, target, crashResult.container, fromList, true);
       } else {
         nestJudgeOperate.call(this, target, crashResult.container, fromList, false);
@@ -107,6 +124,11 @@ export function spiltOperate(target, conTarget, mousePayload) {
   switch(conType) {
     // 更新容器的状态
     case 'circle': {
+      splitWhileOperate.call(this, target, conTarget, fromList);
+      break;
+    }
+
+    case 'inOrder': {
       splitWhileOperate.call(this, target, conTarget, fromList);
       break;
     }
@@ -174,6 +196,10 @@ export function adjustOperate(target, conTarget, conList) {
     case 'circle': {
       adjustSvgPosi.call(this, target, conList, whileOption, conTarget);
       break;
+    }
+
+    case 'inOrder': {
+      adjustSvgPosi.call(this, target, conList, whileOption, conTarget);
     }
 
     case 'judge': {

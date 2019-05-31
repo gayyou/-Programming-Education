@@ -1,4 +1,4 @@
-import { getTypeAndID, getTransform, insertSort, cloneSvgInfo, listHasTC, findItem, getSvgWH } from '../shared/utils'
+import { getTypeAndID, getTransform, insertSort, cloneSvgInfo, listHasTC, findItem, getSvgWH, getTotalPosi } from '../shared/utils'
 import { cloneList } from '../shared/listUtils.js'
 import { isSvgContainer } from '../shared/typeCheck.js'
 import { whileOption, judgeOption } from './options'
@@ -15,8 +15,11 @@ import { whileOption, judgeOption } from './options'
 export function toContainer(target, crashTarget, fromList, toList) {
   let { type, id } = getTypeAndID(target),
       { id: conID } = getTypeAndID(crashTarget),
+      bashY = getTotalPosi(crashTarget, this.$store.state.canvasList),
+      targetY = getTotalPosi(target, this.$store.state.canvasList),
+      newY = targetY.y - bashY.y,
       move = null;
-      
+
   for (let i = 0; i < fromList[type].length; i++) {
     if (fromList[type][i].id == id) {
       if (isSvgContainer(target)) {
@@ -37,6 +40,15 @@ export function toContainer(target, crashTarget, fromList, toList) {
       } else {
         for (let j = 0; j < toList.length; j++) {
           if (conID == toList[j].id) {
+            if (type == 'condition') {
+
+              if (toList[j].contain.condition.length == 1) {
+                echangePosi.call(this, toList[j].contain.condition[0]);
+                toList[j].contain.condition.pop();
+              }
+            } else {
+              move.y = newY;
+            }
             toList[j].contain[type].push(move);
           }
         }
@@ -48,6 +60,12 @@ export function toContainer(target, crashTarget, fromList, toList) {
   this.$store.state.isRenew = !this.$store.state.isRenew;
 }
 
+function echangePosi(item) {
+  let { x, y } = getTotalPosi($('#' + item.id)[0], this.$store.state.canvasList);
+  item.x = x + 240;
+  item.y = y;
+  this.$store.state.canvasList.condition.push(item);
+}
 
 
 /**
@@ -62,14 +80,23 @@ export function adjustSvgPosi(target, conList, options, conTarget) {
       { type: conType } = getTypeAndID(conTarget),
       keys = Object.keys(conList);
 
-  if (type == 'condition') {
-    if (isSvgContainer($(target).parent()[0]) && listHasTC('condition', conList)) {
-      let item = findItem($(target).parent()[0], this.$store.state.canvasList);
-      item.hasCdn = true;
-    } else if (isSvgContainer($(target).parent()[0])) {
-      item.hasCdn = false;
-    }
+  let conItem = findItem(conTarget, this.$store.state.canvasList);
+
+  if (conItem.contain.condition.length == 1) {
+    conItem.hasCdn = true;
+  } else {
+    conItem.hasCdn = false;
   }
+
+  // 判断是否有condition
+  // if (type == 'condition') {
+  //   if (isSvgContainer($(target).parent()[0]) && listHasTC('condition', conList)) {
+  //     let item = findItem($(target).parent()[0], this.$store.state.canvasList);
+      
+  //   } else if (isSvgContainer($(target).parent()[0])) {
+      
+  //   }
+  // }
   
 
   // 获得所有子节点
@@ -112,56 +139,61 @@ export function adjustSvgPosi(target, conList, options, conTarget) {
   }
 }
 
-export function addShadow(conTarget, conList) {
-  let keys = Object.keys(conList),
-      childList = [],
-      options = null,
-      { id: conID, type: conType } = getTypeAndID(conTarget);
+// export function addShadow(conTarget, conList) {
+//   let keys = Object.keys(conList),
+//       childList = [],
+//       options = null,
+//       { id: conID, type: conType } = getTypeAndID(conTarget);
 
-  switch(conType) {
-    case 'circle': {
-      options = whileOption; 
-      break;
-    }
+//   switch(conType) {
+//     case 'circle': {
+//       options = whileOption; 
+//       break;
+//     }
+
+//     case 'inOrder': {
+//       options = whileOption; 
+//       break;
+//     }
     
-    case 'judge': {
-      options = judgeOption;
-      break;
-    }
-  }
+//     case 'judge': {
+//       options = judgeOption;
+//       break;
+//     }
+//   }
 
-  for (let i = 0; i < keys.length; i++) {
-    if (keys[i] == 'shadow') {
-      if (conList[keys[i]] == null) {
-        continue;
-      }
-      let shadowKey = Object.keys(conList[keys[i]])[0];
-      if (conList[keys[i]]) {
-        let shadow = $('#' + shadowKey + 'Sha')[0];
-        let { height, width } = getSvgWH(shadow);
-        childList.push({
-          y: conList[keys[i]][shadowKey].y,
-          height,
-          width,
-          x: 24
-        })
-      }
-      continue;
-    }
-    for (let j = 0; j < conList[keys[i]].length; j++) {
-      childList.push(conList[keys[i]][j]);
-    }
-  }
+//   for (let i = 0; i < keys.length; i++) {
+//     if (keys[i] == 'shadow') {
+//       if (conList[keys[i]] == null) {
+//         continue;
+//       }
+//       let shadowKey = Object.keys(conList[keys[i]])[0];
+//       if (conList[keys[i]]) {
+//         let shadow = $('#' + shadowKey + 'Sha')[0];
+//         let { height, width } = getSvgWH(shadow);
+//         childList.push({
+//           y: conList[keys[i]][shadowKey].y,
+//           height,
+//           width,
+//           x: 24
+//         })
+//       }
+//       continue;
+//     }
+//     for (let j = 0; j < conList[keys[i]].length; j++) {
+//       childList.push(conList[keys[i]][j]);
+//     }
+//   }
 
-  insertSort(childList); // 排序
+//   insertSort(childList); // 排序
 
-  if (conType == 'judge') {
-    adjustJudge.call(this, childList, conTarget, options)
-  } else {
-    // 对circle的调整
-    adjustWhile.call(this, childList, conTarget, options);
-  }
-}
+//   if (conType == 'judge') {
+//     adjustJudge.call(this, childList, conTarget, options)
+//   } else {
+//     // 对circle的调整
+//     adjustWhile.call(this, childList, conTarget, options);
+//   }
+// }
 
 function adjustWhile(childList, conTarget, options) {
   let bashX = options.bashX,
@@ -170,6 +202,7 @@ function adjustWhile(childList, conTarget, options) {
       nextBash = 0,
       item = findItem(conTarget, this.$store.state.canvasList);
 
+  
   for (let i = 0; i < childList.length; i++) {
     if (childList[i].type == 'condition') {
       continue;
@@ -182,9 +215,10 @@ function adjustWhile(childList, conTarget, options) {
 
     if (currentBash <= options.firstBash + 12) {
       // 第一次的时候，因为会有空隙，所以while循环块的扩大会比目标的height还要大出12
-      currentBash = childList[i].height + options.pathBash;  // 这个12是通过试验得出的。
+      currentBash = childList[i].height + 12;  // 这个12是通过试验得出的。
     } else {
       // 第二次及以后，则直接加上increationY这么大
+      
       currentBash = childList[i].height + currentBash;
     }
   }
@@ -197,7 +231,6 @@ function adjustWhile(childList, conTarget, options) {
     firstBash: currentBash,
     currentY: bashY
   }
-
   
 
   // 在视图层改变之前先更新一波
@@ -217,8 +250,10 @@ function adjustJudge(childList, conTarget, options) {
       firstFlag = false,
       ifElseLine = conTarget.getElementsByClassName('else')[0].getAttribute('transform'),
       item = findItem(conTarget, this.$store.state.canvasList);
+      ifElseLine = item.svgOptions.textBash;
 
-  ifElseLine = parseInt(ifElseLine.split(' ')[5]);
+  
+  // ifElseLine = parseInt(ifElseLine.split(' ')[5]);
 
   // let textBash = parseInt(conTarget.getAttribute('data-textBash'));
   

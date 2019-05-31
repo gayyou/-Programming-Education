@@ -5,22 +5,12 @@
         @click="choiceRec"
       >
         <rec-list
-          :index="'2'"
+          v-for="(item, index) in list"
+          :key="item.id"
+          :index="index"
           :name="'把物品放后面'"
           :point="9.5"
-          :svgList="$data.list2"
-        ></rec-list>
-        <rec-list
-          :index="$data.index"
-          :name="'向前移动后向后移动'"
-          :point="8"
-          :svgList="$data.list"
-        ></rec-list>
-        <rec-list
-          :index="'3'"
-          :name="'举起物品后放下'"
-          :point="9"
-          :svgList="$data.list3"
+          :svgList="item.contain"
         ></rec-list>
         <!-- <rec-list
           :name="'拾起物品'"
@@ -57,278 +47,212 @@ export default {
       index: 1,
       option: null,
       subToken: null,
-      list: {
-          assist: [],
-          circle: [{
-            hasCdn: true,
-            height: 120,
-            id: "el993",
-            value: "",
-            width: 208.1999969482422,
-            x: 1,
-            y: 1,
-            contain: {
-              assist: [],
-              circle: [],
-              condition: [],
-              judge: [],
-              noRefFunc: [],
-              order: [],
-              refFunc: [],
-            }
-          }],
-          condition: [],
-          judge: [],
-          noRefFunc: [],
-          order: [],
-          refFunc: [],
-      },
-      list2: {
-        assist: [],
-          circle: [{
-            hasCdn: true,
-            height: 120,
-            id: "el118",
-            value: "",
-            width: 208.1999969482422,
-            x: 1,
-            y: 1,
-            contain: {
-              assist: [],
-              circle: [],
-              condition: [],
-              judge: [],
-              noRefFunc: [],
-              order: [],
-              refFunc: [],
-            }
-          }],
-          condition: [],
-          judge: [],
-          noRefFunc: [],
-          order: [],
-          refFunc: [],
-      },
-      list3: {
-        assist: [],
-          circle: [{
-            hasCdn: true,
-            height: 120,
-            id: "el128",
-            value: "",
-            width: 208.1999969482422,
-            x: 1,
-            y: 1,
-            contain: {
-              assist: [],
-              circle: [],
-              condition: [],
-              judge: [],
-              noRefFunc: [],
-              order: [],
-              refFunc: [],
-            }
-          }],
-          condition: [],
-          judge: [],
-          noRefFunc: [],
-          order: [],
-          refFunc: [],
-      }
+      list: [
+        {
+          id: 'name1',
+          name: 'name1',
+          contain: {
+            circle: [
+              {
+                "x": 495,
+                "y": 156,
+                "width": 332,
+                "height": 168,
+                "id": "el0",
+                "type": "circle",
+                "value": "循环",
+                "svgOptions": {
+                  "firstBash": 108,
+                  "currentY": 144
+                },
+                "contain": {},
+                "hasCdn": true
+              }
+          ]
+          }
+        },
+        {
+          id: 'name2',
+          name: 'name2',
+          contain: {
+            circle: [
+              {
+                "x": 495,
+                "y": 156,
+                "width": 332,
+                "height": 168,
+                "id": "el0",
+                "type": "circle",
+                "value": "循环",
+                "svgOptions": {
+                  "firstBash": 108,
+                  "currentY": 144
+                },
+                contain: {},
+                "hasCdn": true
+              }
+          ]
+          }
+        },
+      ]
     }
   },
   mounted() {
-      let container = $('#el993')[0];
-      this.$data.list.circle[0].contain.order.push({
-        height: 48,
-        id: "el991",
-        value: ["向前", '步', 10],
-        width: 154.9,
-        x: 24.2,
-        y: 48,
-      },
-      {
-        height: 48,
-        id: "el994",
-        value: ["向前", '步', 10],
-        width: 154.9,
-        x: 24.2,
-        y: 144,
-      });
-      this.$data.list.circle[0].contain.noRefFunc.push({
-        height: 48,
-        id: "el999",
-        value: '向后转',
-        width: 126,
-        x: 24.2,
-        y: 96,
-      });
-      this.$data.list.circle[0].contain.condition.push({
-        x: 140,
-        y: 7.5,
-        id: "el997",
-        width: 174,
-        height: 34,
-        value: "重复执行到达一次"
+    this.$http
+      .get('/user/queryAdvice?id=12')
+      .then(res => {
+        console.log(res.data);
+      })
+      .catch(err => {
+
       })
 
-
-
-      this.$data.list2.circle[0].contain.assist.push(
-      {
-        height: 48,
-        id: "el119",
-        value: "合并机械臂",
-        width: 126,
-        x: 24.2,
-        y: 48,
-      },
-      {
-        height: 48,
-        id: "el1110",
-        value: "抬起机械臂",
-        width: 126,
-        x: 24.2,
-        y: 96,
-      });
-      this.$data.list2.circle[0].contain.noRefFunc.push({
-        height: 48,
-        id: "el1111",
-        value: "向右转",
-        width: 126,
-        x: 24.2,
-        y: 144,
-      });
-      this.$data.list2.circle[0].contain.condition.push({
-        x: 140,
-        y: 7.5,
-        id: "el1112",
-        width: 174,
-        height: 34,
-        value: "重复执行到达一次"
-      })
-      this.$data.list2.circle[0].contain.assist.push(
-        {
-          height: 48,
-          id: "el1113",
-          value: "放下机械臂",
-          width: 126,
-          x: 24.2,
-          y: 192,
-        },
-        {
-          height: 48,
-          id: "el1114",
-          value: "松开机械臂",
-          width: 126,
-          x: 24.2,
-          y: 240,
-      });
-
-
-
-
-      this.$data.list3.circle[0].contain.assist.push(
-      {
-        height: 48,
-        id: "el129",
-        value: "合并机械臂",
-        width: 126,
-        x: 24.2,
-        y: 48,
-      },
-      {
-        height: 48,
-        id: "el1120",
-        value: "抬起机械臂",
-        width: 126,
-        x: 24.2,
-        y: 96,
-      });
-      this.$data.list3.circle[0].contain.condition.push({
-        x: 140,
-        y: 7.5,
-        id: "el1122",
-        width: 174,
-        height: 34,
-        value: "重复执行到达一次"
-      })
-      this.$data.list3.circle[0].contain.assist.push(
-        {
-          height: 48,
-          id: "el1123",
-          value: "放下机械臂",
-          width: 126,
-          x: 24.2,
-          y: 144,
-        },
-        {
-          height: 48,
-          id: "el1124",
-          value: "松开机械臂",
-          width: 126,
-          x: 24.2,
-          y: 192,
-      });
-
-
-
-
-
-
-      let option;
-      setTimeout(() => {
-        let target = $('#el991')[0];
-        let target4 = $('#el994')[0];
-        let target7 = $('#el997')[0];
-        let target8 = $('#el999')[0]
-        // let target5 = $('#el5')[0];
-        nestWhileOperate.bind(this)(target8, container, this.$data.list, true);
-        nestWhileOperate.bind(this)(target, container, this.$data.list, true);
-        nestWhileOperate.bind(this)(target7, container, this.$data.list, true);
-        option = nestWhileOperate.bind(this)(target4, container, this.$data.list, true);
-        this.$data.option = option;
-        // nestWhileOperate.bind(this)(target5, container, this.$data.list);
-      }, 0);
-      
-
-      setTimeout(() => {
-        let target9 = $('#el119')[0];
-        let target10 = $('#el1110')[0];
-        let target11 = $('#el1111')[0];
-        let target12 = $('#el1112')[0];
-        let target13 = $('#el1113')[0];
-        let target14 = $('#el1114')[0];
-        // let target5 = $('#el5')[0];
-        let container = $('#el118')[0]
-        nestWhileOperate.bind(this)(target9, container, this.$data.list, true);
-        nestWhileOperate.bind(this)(target10, container, this.$data.list, true);
-        nestWhileOperate.bind(this)(target11, container, this.$data.list, true);
-        nestWhileOperate.bind(this)(target12, container, this.$data.list, true);
-        nestWhileOperate.bind(this)(target13, container, this.$data.list, true);
-        nestWhileOperate.bind(this)(target14, container, this.$data.list, true);
-        // nestWhileOperate.bind(this)(target5, container, this.$data.list);
-      }, 0);
-
-
-    setTimeout(() => {
-        let target9 = $('#el129')[0];
-        let target10 = $('#el1120')[0];
-        // let target11 = $('#el1121')[0];
-        let target12 = $('#el1122')[0];
-        let target13 = $('#el1123')[0];
-        let target14 = $('#el1124')[0];
-        // let target5 = $('#el5')[0];
-        let container = $('#el128')[0]
-        nestWhileOperate.bind(this)(target9, container, this.$data.list, true);
-        nestWhileOperate.bind(this)(target10, container, this.$data.list, true);
-        // nestWhileOperate.bind(this)(target11, container, this.$data.list, true);
-        nestWhileOperate.bind(this)(target12, container, this.$data.list, true);
-        nestWhileOperate.bind(this)(target13, container, this.$data.list, true);
-        nestWhileOperate.bind(this)(target14, container, this.$data.list, true);
-        // nestWhileOperate.bind(this)(target5, container, this.$data.list);
-      }, 0);
-
+    this.$data.list[0].contain.circle[0].contain = {
+                  "condition": [
+                    {
+                        "x": 140,
+                        "y": 7,
+                        "width": 174,
+                        "height": 34,
+                        "id": "el3",
+                        "type": "condition",
+                        "value": [
+                            [
+                                "顺序代码执行完毕"
+                            ],
+                            [
+                                "order"
+                            ]
+                        ],
+                        "func": null
+                    }
+                  ],
+                  "order": [],
+                  "assist": [],
+                  "noRefFunc": [],
+                  "refFunc": [],
+                  "circle": [],
+                  "judge": [],
+                  "doubleRef": [
+                    {
+                      "x": 24.2,
+                      "y": 48,
+                      "width": 248,
+                      "height": 48,
+                      "id": "el1",
+                      "type": "doubleRef",
+                      "value": [
+                          [
+                              "向前移动",
+                              "速度",
+                              "秒"
+                          ],
+                          [
+                              10,
+                              50
+                          ]
+                      ],
+                      "func": "move_ahead"
+                    },
+                    {
+                        "x": 24.2,
+                        "y": 96,
+                        "width": 248,
+                        "height": 48,
+                        "id": "el2",
+                        "type": "doubleRef",
+                        "value": [
+                            [
+                                "向左移动",
+                                "速度",
+                                "秒"
+                            ],
+                            [
+                                10,
+                                50
+                            ]
+                        ],
+                        "func": "move_left"
+                    }
+                  ],
+                  "longRefFunc": [],
+                  "longRightRef": [],
+                  "inOrder": []
+                };
+    this.$data.list[1].contain.circle[0].contain = {
+                  "condition": [
+                    {
+                        "x": 140,
+                        "y": 7,
+                        "width": 174,
+                        "height": 34,
+                        "id": "el3",
+                        "type": "condition",
+                        "value": [
+                            [
+                                "顺序代码执行完毕"
+                            ],
+                            [
+                                "order"
+                            ]
+                        ],
+                        "func": null
+                    }
+                  ],
+                  "order": [],
+                  "assist": [],
+                  "noRefFunc": [],
+                  "refFunc": [],
+                  "circle": [],
+                  "judge": [],
+                  "doubleRef": [
+                    {
+                      "x": 24.2,
+                      "y": 48,
+                      "width": 248,
+                      "height": 48,
+                      "id": "el1",
+                      "type": "doubleRef",
+                      "value": [
+                          [
+                              "向前移动",
+                              "速度",
+                              "秒"
+                          ],
+                          [
+                              10,
+                              50
+                          ]
+                      ],
+                      "func": "move_ahead"
+                    },
+                    {
+                        "x": 24.2,
+                        "y": 96,
+                        "width": 248,
+                        "height": 48,
+                        "id": "el2",
+                        "type": "doubleRef",
+                        "value": [
+                            [
+                                "向左移动",
+                                "速度",
+                                "秒"
+                            ],
+                            [
+                                10,
+                                50
+                            ]
+                        ],
+                        "func": "move_left"
+                    }
+                  ],
+                  "longRefFunc": [],
+                  "longRightRef": [],
+                  "inOrder": []
+                };
+    // let data = '"[{"x":479,"y":120,"width":272.20001220703125,"height":360,"id":"el0","type":"circle","value":"循环","svgOptions":{"firstBash":300,"currentY":336},"contain":{"condition":[],"order":[],"assist":[{"x":24.2,"y":192,"width":126,"height":48,"id":"el5","type":"assist","value":"合并机械臂","func":"close_arm"},{"x":24.2,"y":288,"width":126,"height":48,"id":"el7","type":"assist","value":"松开机械臂","func":"open_arm"}],"noRefFunc":[],"refFunc":[],"circle":[],"judge":[],"doubleRef":[{"x":24.2,"y":48,"width":248,"height":48,"id":"el1","type":"doubleRef","value":[["向前移动","速度","秒"],[2,3]],"func":"move_ahead"},{"x":24.2,"y":96,"width":248,"height":48,"id":"el2","type":"doubleRef","value":[["向后移动","速度","秒"],[4,6]],"func":"move_behind"}],"longRefFunc":[],"longRightRef":[{"x":24.2,"y":144,"width":248,"height":48,"id":"el4","type":"longRightRef","value":[["机械上臂向下摆动","度"],[3]],"func":"move_arm_high_down"},{"x":24.2,"y":240,"width":248,"height":48,"id":"el6","type":"longRightRef","value":[["机械上臂向上摆动","度"],[3]],"func":"move_arm_high_up"}],"inOrder":[]},"hasCdn":false}]"'
+    // console.log(JSON.parse(data))
     this.$data.subToken = PubSub.subscribe('checkRecommand', this.recommandToMain);
   },
   methods: {

@@ -69,14 +69,62 @@
 import PubSub from 'pubsub-js'
 import { formatData } from '../../utils/shared/model.js'
 import { findItem } from '../../utils/shared/listUtils.js'
+import { checkData } from '../../utils/shared/typeCheck.js'
 export default {
   mounted() {
     let token = PubSub.subscribe('update', (e, data) => {
       
+      
+      // let requestData = {
+      //   type: 'if',
+      //   condition: 'true',
+      //   tab: 1,
+      //   ops: null,
+      //   children: []
+      // }
+
+      if (data.cancel == true) {
+        return ;
+      }
+
+      if (this.$store.state.choiceTarget == null) {
+        this.$store.state.message = '请选择想要执行的代码块'
+        this.$store.state.showMessage = true;
+        return ;
+      }
+
       let item = findItem(this.$store.state.choiceTarget, this.$store.state.canvasList);
       let result = formatData(item);
-      console.log(JSON.stringify(result))
-      PubSub.unsubscribe(token);
+
+      if (checkData(result) == false) {
+        this.$store.state.message = '请添加条件'
+        this.$store.state.showMessage = true;
+          return ;
+      }
+
+      if (result.type == 'while') {
+        result.type = 'if';
+        result.condition = 'True';
+      }
+
+
+
+      let send = {
+        id: 12,
+        program: result
+      }
+      this.$http
+      .post('/user/program', send)
+      .then((res) => {
+        let data = res.data;
+        if (data.code == '200') {
+          this.$store.state.message = '成功提交编程方案，正在给机器人下发指令，请注意机器人的行为！'
+          this.$store.state.showMessage = true;
+        }
+      })
+      console.log(send)
+      // console.log(requestData)
+      // PubSub.unsubscribe(token);
     })
   },
   methods: {

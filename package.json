@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "flow": "flow check"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -17,7 +18,10 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.6.0",
     "@vue/cli-service": "^3.6.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-flow": "^6.23.0",
     "element-ui": "^2.7.2",
+    "flow-bin": "^0.99.1",
     "node-sass": "^4.11.0",
     "pubsub-js": "^1.7.0",
     "sass-loader": "^7.1.0",

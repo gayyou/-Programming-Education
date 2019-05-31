@@ -1,4 +1,4 @@
-import { getTransform, getTypeAndID } from './utils'
+import { getTransform, getTypeAndID, getTotalPosi } from './utils'
 
 export function changeInput(event, payload) {
   if (this.model) {
@@ -6,7 +6,7 @@ export function changeInput(event, payload) {
   }
   event.stopPropagation();
   let { id, type } = getTypeAndID(this.$el),
-      { x, y } = getTransform(this.$el),
+      { x, y } = getTotalPosi(this.$el, this.$store.state.canvasList),
       { x: textX, y: textY } = getTransform(event.target),
       index = event.target.getAttribute('data-index');
   this.$store.state.isInput.id = id;

@@ -4,6 +4,7 @@ import { isSvgContainer } from './shared/typeCheck'
 import { renewWhileOption, renewJudgeOption } from './svgOperate/options'
 import { choiceUpdate } from './moveEndUtils'
 import { hideGlobalInput } from './shared/changeTextUtils'
+import { remeberCdn } from './moveEndUtils'
 
 /**
  * @description 混入模式，将这个可移动的组件添加一个点击事件,点击将全局的拖拽对象moveTarget赋值为这个组件
@@ -89,6 +90,10 @@ export function createModelMixin() {
         break;
       }
       case 'circle': {
+        newItem.svgOptions = Object.assign({}, renewWhileOption);
+        break;
+      }
+      case 'inOrder': {
         newItem.svgOptions = Object.assign({}, renewWhileOption);
         break;
       }

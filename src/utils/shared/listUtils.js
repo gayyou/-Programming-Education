@@ -239,7 +239,7 @@ export function componentListMixin(conObj) {
  * @param {*} item 
  */
 export function listPush(list, type, item) {
-  if (type == 'circle' || type == 'judge') {
+  if (type == 'circle' || type == 'judge' || type == 'inOrder') {
     // 如果是判断语句或者选择语句，需要特殊照顾
     item.contain = {
       // shadow: null  //这句shadow是要做阴影时候用的，现在不需要用到
@@ -292,3 +292,4 @@ export function adjustList(list, conID) {
     
   }
 }
+

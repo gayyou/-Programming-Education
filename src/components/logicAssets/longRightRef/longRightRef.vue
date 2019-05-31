@@ -44,13 +44,13 @@ export default {
       // 下面这两个没什么区别，区别主要是点击的不同，设置两个的原因是这两个东西其实不是嵌套的,不知道叫做什么，乱写名字，后期改
       changeInput.call(this, event, {
         x: -50,
-        y: -13
+        y: -12.5
       });
     },
     numberInput(event) {
       changeInput.call(this, event, {
         x: -89,
-        y: 16.5
+        y: 17.5
       });
     }
   }

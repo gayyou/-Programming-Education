@@ -2,10 +2,10 @@
   <div id="app">
     <head-nav></head-nav>
     <div class="main">
-      <!-- <recommand
+      <recommand
         class="recommand"
         :style="!$store.state.isCode ? 'z-index: 1' : 'z-index: 0'"
-      ></recommand> -->
+      ></recommand>
       <index
         class="index"
         :style="$store.state.isCode ? 'z-index: 1' : 'z-index: 0'"
@@ -98,7 +98,7 @@ input {
 button {
     border: none;
     outline: none;
-    cursor:pointer;             
+    cursor:pointer;
 }
 
 path {

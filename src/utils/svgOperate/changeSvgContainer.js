@@ -117,14 +117,21 @@ export function nestJudgeOperate(target, conTarget, list, isIf) {
 
     nextY = currentY + height;
 
-    item.svgOptions = {
-      firstBash: nextFirstBash,
-      secondBash: secondBash,
-      textBash,
-      firstTime,
-      currentY: nextY,
-      currentSecondY: nextSecondY
-    }
+    // item.svgOptions.firstBash = nextFirstBash
+    // item.svgOptions.secondBash = secondBash
+    // item.svgOptions.textBash = textBash
+    // item.svgOptions.firstTime = firstTime
+    // item.svgOptions.currentY = nextY
+    // item.svgOptions.currentSecondY = nextSecondY
+
+    // item.svgOptions = {
+    //   firstBash: nextFirstBash,
+    //   secondBash: secondBash,
+    //   textBash,
+    //   firstTime,
+    //   currentY: nextY,
+    //   currentSecondY: nextSecondY
+    // }
   } else {
     if (secondBash == judgeOption.secondBash) {
       nextSecondBash = secondBash - height + 23.5;
@@ -134,11 +141,11 @@ export function nestJudgeOperate(target, conTarget, list, isIf) {
       nextFirstBash = height + firstBash;
     }
 
-    // let nextD = judgeOption.firstHalf 
-    //           + nextFirstBash 
-    //           + judgeOption.secondHalf
-    //           + nextSecondBash    // 这里需要加之前的第二个基础，因为在if中插入的时候并不会影响第二个
-    //           + judgeOption.lastHalf;
+    let nextD = judgeOption.firstHalf 
+              + nextFirstBash 
+              + judgeOption.secondHalf
+              + nextSecondBash    // 这里需要加之前的第二个基础，因为在if中插入的时候并不会影响第二个
+              + judgeOption.lastHalf;
 
     for (let i = 0; i < list[type].length; i++) {
       if (list[type][i].id == id) {
@@ -154,15 +161,20 @@ export function nestJudgeOperate(target, conTarget, list, isIf) {
     // conTarget.setAttribute('data-currentSecondY', nextY);  // 将其设置到碰撞容器中，方便下次进行获取
     // conTarget.setAttribute('data-secondBash', nextSecondBash);  // 将其设置到碰撞容器中，方便下次进行获取
     // conTarget.setAttribute('data-firstBash', nextFirstBash);  // 将其设置到碰撞容器中，方便下次进行获取
-
-    item.svgOptions = {
-      firstBash: nextFirstBash,
-      secondBash: nextSecondBash,
-      textBash,
-      firstTime,
-      currentY,
-      currentSecondY: nextY
-    }
+    // item.svgOptions.firstBash = nextFirstBash;
+    // item.svgOptions.secondBash = nextSecondBash;
+    // item.svgOptions.textBash = textBash;
+    // item.svgOptions.firstTime = firstTime;
+    // item.svgOptions.currentY = currentY;
+    // item.svgOptions.currentSecondY = nextY;
+    // item.svgOptions = {
+    //   firstBash: nextFirstBash,
+    //   secondBash: nextSecondBash,
+    //   textBash,
+    //   firstTime,
+    //   currentY,
+    //   currentSecondY: nextY
+    // }
   }
 }
 
@@ -184,6 +196,7 @@ function nestConditionOperate(target, conTarget, list) {
           list[type][i].x = 140;
           break;
         }
+
         case 'judge': {
           list[type][i].x = 80;
           break;

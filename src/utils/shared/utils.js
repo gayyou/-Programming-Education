@@ -95,6 +95,20 @@ export function insertSort(list) {
     }
 }
 
+export function getAllChildren(contain) {
+  let childList = [],
+      keys = Object.keys(contain);
+
+  for (let i = 0; i < keys.length; i++) {
+    // 获取所有子节点
+    for (let j = 0; j < contain[keys[i]].length; j++) {
+      childList.push(contain[keys[i]][j]);
+    }
+  }
+
+  return childList;
+}
+
 /**
  * @description 克隆目标信息，target是结果，model是模板
  * @param {Dom} target 

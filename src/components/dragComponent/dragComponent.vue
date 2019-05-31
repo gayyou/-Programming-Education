@@ -69,6 +69,18 @@
         :value="item.value"
         :model="false"
       ></refFunc>
+      <inOrder
+        v-for="item in $store.state.canvasList.inOrder"
+        :key="item.id"
+        :containObject="item.contain"
+        :y="item.y"
+        :x="item.x"
+        :id="item.id"
+        :value="item.value"
+        :model="false"
+        :svgOptions="item.svgOptions"
+      >
+      </inOrder>
       <circles
         v-for="item in $store.state.canvasList.circle"
         :key="item.id"
@@ -297,6 +309,17 @@
       <g transform="translate(12,0)" display="block" id="move-operate">
         <text class="operate-title" x="20" y="20" text-anchor="middle" dominant-baseline="central" dy="0">逻辑</text>
       </g>
+      <!-- <inOrder
+        :model="true"
+        :y="40"
+        :x="20"
+        :value="'循环'"
+        :containObject="{}"
+        :svgOptions="{
+          firstBash: 36
+        }"
+      >   -->
+      <!-- </inOrder> -->
       <circles
         :model="true"
         :y="40"
@@ -343,7 +366,19 @@
           textBash: 100.3763
         }"
       ></judge>
-
+      <inOrder
+        id="fake-inOrder"
+        :model="true"
+        v-if="$store.state.model.type === 'inOrder'"
+        :y="$store.state.model.y"
+        :x="$store.state.model.x"
+        :value="'循环'"
+        :containObject="{}"
+        :svgOptions="{
+          firstBash: 36
+        }"
+      >  
+      </inOrder>
 
     </svg>
     <svg xmlns="http://www.w3.org/2000/svg" width="3.66rem" height="100%" id="model-container"
@@ -354,17 +389,23 @@
       </g>
       <condition
         :model="true"
-        :value="'程序结束'"
+        :value="[['顺序代码执行完毕'], ['order']]"
         :y="40"
         :x="20"
       ></condition>
       <condition
         :model="true"
-        :value="'前方存在障碍物'"
+        :value="[['前方存在障碍物'], ['check_thing(100)']]"
         :y="90"
         :x="20"
       ></condition>
       <condition
+        :model="true"
+        :value="[['前方为红色物品'], ['True']]"
+        :y="140"
+        :x="20"
+      ></condition>
+      <!-- <condition
         :model="true"
         :value="'左方存在障碍物'"
         :y="140"
@@ -405,7 +446,7 @@
         :value="'重复执行到达10次'"
         :y="440"
         :x="20"
-      ></condition>
+      ></condition> -->
       <condition
         id="fake-condition"
         v-if="$store.state.model.type === 'condition'"
@@ -437,57 +478,65 @@
       ></assist> -->
       <assist
         :model="true"
-        :value="'合并机械臂'"
+        :value="[['合并机械臂'], []]"
         :y="40"
         :x="20"
         :func="'close_arm'"
       ></assist>
       <assist
         :model="true"
-        :value="'松开机械臂'"
+        :value="[['松开机械臂'], []]"
         :y="110"
         :x="20"
         :func="'open_arm'"
       ></assist>
+      <order
+        :model="true"
+        :value="[['延时', '秒'], [0]]"
+        :y="180"
+        :x="20"
+        :func="'delay_ms'"
+      >
+      </order>
       <longRightRef
         :model="true"
         :value="[['机械上臂向上摆动', '度'], [0]]"
-        :y="180"
+        :y="250"
         :x="20"
         :func="'move_arm_high_up'"
       ></longRightRef>
       <longRightRef
         :model="true"
         :value="[['机械上臂向下摆动', '度'], [0]]"
-        :y="250"
+        :y="320"
         :x="20"
         :func="'move_arm_high_down'"
       ></longRightRef>
       <longRightRef
         :model="true"
         :value="[['机械下臂向上摆动', '度'], [0]]"
-        :y="320"
+        :y="390"
         :x="20"
         :func="'move_arm_low_up'"
       ></longRightRef>
       <longRightRef
         :model="true"
         :value="[['机械下臂向下摆动', '度'], [0]]"
-        :y="390"
+        :y="460"
         :x="20"
         :func="'move_arm_low_down'"
       ></longRightRef>
       <longRightRef
         :model="true"
         :value="[['机械上臂向左转动', '度'], [0]]"
-        :y="460"
+        :y="530"
         :x="20"
         :func="'move_arm_left'"
       ></longRightRef>
       <longRightRef
         :model="true"
         :value="[['机械上臂向右转动', '度'], [0]]"
-        :y="530"
+        :y="600"
         :x="20"
         :func="'move_arm_right'"
       ></longRightRef>
@@ -507,6 +556,15 @@
         :y="$store.state.model.y"
         :x="$store.state.model.x"
       ></longRightRef>
+      <order
+        id="fake-order"
+        v-if="$store.state.model.type === 'order'"
+        :model="true"
+        :value="$store.state.model.value"
+        :y="$store.state.model.y"
+        :x="$store.state.model.x"
+      >
+      </order>
     </svg>
 
     <div class="global-input">
@@ -525,6 +583,7 @@ import assist from '../logicAssets/assist/assist.vue'
 import doubleRef from '../logicAssets/doubleRef/doubleRef.vue'
 import longRefFunc from '../logicAssets/longRefFunc/longRefFunc.vue'
 import longRightRef from '../logicAssets/longRightRef/longRightRef.vue'
+import inOrder from '../logicAssets/inOrder/inOrder.vue'
 import Vue from 'vue';
 import { renewWhileOption, renewJudgeOption } from '../../utils/svgOperate/options.js'
 import { isCrash } from '../../utils/svgOperate/checkCrash.js'
@@ -533,7 +592,7 @@ import { nestOperate, spiltOperate, deleteOperate } from '../../utils/svgOperate
 import { getTransform, getTypeAndID, getTotalPosi } from '../../utils/shared/utils.js'
 import { adjustOperate } from '../../utils/svgOperate/drag.js'
 import { isSvgContainer } from '../../utils/shared/typeCheck.js'
-import { changeSvgNest, changeSvgPosi, choiceUpdate } from '../../utils/moveEndUtils.js'
+import { changeSvgNest, changeSvgPosi, choiceUpdate, remeberCdn } from '../../utils/moveEndUtils.js'
 import { addShadow } from '../../utils/svgOperate/domOperate.js'
 import { hideGlobalInput } from '../../utils/shared/changeTextUtils'
 
@@ -547,7 +606,8 @@ export default {
     assist,
     doubleRef,
     longRefFunc,
-    longRightRef
+    longRightRef,
+    inOrder
   },
   data() {
     return {
@@ -566,7 +626,7 @@ export default {
   },
   methods: {
     dragStart(event) {
-      hideGlobalInput()
+      hideGlobalInput();
     },
     dragMove(event) {
       if (!this.$store.state.moveTarget) {
@@ -634,6 +694,7 @@ export default {
         }
 
         let result = isCrash(target, this.$store.state.canvasList, crashPayload);
+        console.log('碰撞结果', result)
         let toConList = null;
 
         if (result) {
@@ -685,6 +746,17 @@ export default {
     },
     inputs(event) {
       event.stopPropagation();
+      let data = event.data;
+      let pattern = new RegExp(/^[0-9]*$/);
+      if (pattern.test(data) == false) {
+        console.log('false')
+        $('.global-input input')[0].value = $('.global-input input')[0].value.slice(0, $('.global-input input')[0].value.length - 1);  
+        return ;
+      }
+      if ($('.global-input input')[0].value.length > 2) {
+        $('.global-input input')[0].value = $('.global-input input')[0].value.slice(0, 2);  
+        console.log(this.$store.state.isInput.value)
+      }
       let type = this.$store.state.isInput.type;
       let id = this.$store.state.isInput.id;
       let index = this.$store.state.isInput.index;

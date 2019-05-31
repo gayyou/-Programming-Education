@@ -20,6 +20,9 @@ export default {
     svgComponent
   },
   props: ['name', 'point', 'svgList', 'index'],
+  mounted() {
+    console.log(this.svgList);
+  }
 }
 </script>
 

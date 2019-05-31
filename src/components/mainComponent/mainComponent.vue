@@ -55,55 +55,6 @@
           </cc:Work>
         </rdf:RDF>
       </metadata>
-      <!-- <circles
-        v-for="(item) in $store.state.elInfo.circle"
-        :value="item.value"
-        :y="item.y"
-        :key="item.id"
-        :model="false"
-      ></circles>
-      <assist
-        v-for="(item) in $store.state.elInfo.assist"
-        :value="item.value"
-        :y="item.y"
-        :key="item.id"
-        :model="false"
-      ></assist>
-      <condition
-        v-for="(item) in $store.state.elInfo.condition"
-        :value="item.value"
-        :y="item.y"
-        :key="item.id"
-        :model="false"
-      ></condition>
-      <judge
-        v-for="(item) in $store.state.elInfo.judge"
-        :value="item.value"
-        :y="item.y"
-        :key="item.id"
-        :model="false"
-      ></judge>
-      <noRefFunc
-        v-for="(item) in $store.state.elInfo.noRefFunc"
-        :value="item.value"
-        :y="item.y"
-        :key="item.id"
-        :model="false"
-      ></noRefFunc>
-      <order
-        v-for="(item) in $store.state.elInfo.order"
-        :value="item.value"
-        :y="item.y"
-        :key="item.id"
-        :model="false"
-      ></order>
-      <refFunc
-        v-for="(item) in $store.state.elInfo.refFunc"
-        :value="item.value"
-        :y="item.y"
-        :key="item.id"
-        :model="false"
-      ></refFunc> -->
       <noRefFunc
         v-for="item in svgList.noRefFunc"
         :key="item.id"
@@ -122,6 +73,18 @@
         :value="item.value"
         :model="false"
       ></refFunc>
+      <inOrder
+        v-for="item in svgList.inOrder"
+        :key="item.id"
+        :containObject="item.contain"
+        :y="item.y"
+        :x="item.x"
+        :id="item.id"
+        :value="item.value"
+        :model="false"
+        :svgOptions="item.svgOptions"
+      >
+      </inOrder>
       <circles
         v-for="item in svgList.circle"
         :key="item.id"
@@ -132,6 +95,7 @@
         :value="item.value"
         :model="false"
         :hasCdn="item.hasCdn"
+        :svgOptions="item.svgOptions"
       ></circles>
       <judge
         v-for="item in svgList.judge"
@@ -143,6 +107,7 @@
         :value="item.value"
         :model="false"
         :hasCdn="item.hasCdn"
+        :svgOptions="item.svgOptions"
       ></judge>
       <assist
         v-for="item in svgList.assist"
@@ -171,6 +136,33 @@
         :value="item.value"
         :model="false"
       ></order>
+      <doubleRef
+        v-for=" item in svgList.doubleRef"
+        :key="item.id"
+        :y="item.y"
+        :x="item.x"
+        :id="item.id"
+        :value="item.value"
+        :model="false"
+      ></doubleRef>
+      <longRefFunc
+        v-for=" item in svgList.longRefFunc"
+        :key="item.id"
+        :y="item.y"
+        :x="item.x"
+        :id="item.id"
+        :value="item.value"
+        :model="false"
+      ></longRefFunc>
+      <longRightRef
+        v-for=" item in svgList.longRightRef"
+        :key="item.id"
+        :y="item.y"
+        :x="item.x"
+        :id="item.id"
+        :value="item.value"
+        :model="false"
+      ></longRightRef>
     </svg>
 </template>
 
@@ -181,6 +173,10 @@ import order from '../logicAssets/order/order.vue'
 import condition from '../logicAssets/condition/condition.vue'
 import noRefFunc from '../logicAssets/noRefFunc/noRefFunc.vue'
 import assist from '../logicAssets/assist/assist.vue'
+import doubleRef from '../logicAssets/doubleRef/doubleRef.vue'
+import longRefFunc from '../logicAssets/longRefFunc/longRefFunc.vue'
+import longRightRef from '../logicAssets/longRightRef/longRightRef.vue'
+import inOrder from '../logicAssets/inOrder/inOrder.vue'
 import { getSvgCenterPosi } from '../../utils/recommendUtils.js'
 import { svgComponentOption } from '../../utils/shared/model.js'
 export default {
@@ -191,9 +187,14 @@ export default {
     order,
     condition,
     noRefFunc,
-    assist
+    assist,
+    doubleRef,
+    longRefFunc,
+    longRightRef,
+    inOrder
   },
   mounted() {
+    console.log('list', this.svgList, this)
     let container = this.$el;
     setTimeout(() => {
       let result = getSvgCenterPosi(container);

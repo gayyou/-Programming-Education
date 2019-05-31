@@ -13,7 +13,7 @@ export function isSvgContainer(checkTarget) {
   }
 
   const checkType = (str) => {
-    return str === 'circle' || str === 'judge';
+    return str === 'circle' || str === 'judge' || str === 'inOrder';
   }
 
   if (typeof checkTarget === 'string') {
@@ -23,3 +23,18 @@ export function isSvgContainer(checkTarget) {
   }
 }
 
+export function checkData(data) {
+  let isTrue = true;
+
+  if (data.type == 'if' || data.type == 'while' || data.type == 'circle' || data.type == 'judge') {
+    if (data.condition == null) {
+      return false;
+    }
+  }
+
+  for (let i = 0; i < data.children.length; i++) {
+    isTrue = checkData(data.children[i]);
+  }
+
+  return isTrue;
+}

@@ -63,12 +63,12 @@ export default {
         // 区分不同的输入块进行传值
         changeInput.call(this, event, {
           x: -137,
-          y: -13.5
+          y: -12.5
         });
       } else {
         changeInput.call(this, event, {
           x: -255,
-          y: -13.5
+          y: -12.5
         });
       }
       
@@ -77,12 +77,12 @@ export default {
       if (event.target.getAttribute('data-index') == 0) {
         changeInput.call(this, event, {
           x: -14,
-          y: 16.5
+          y: 17.5
         });
       } else {
         changeInput.call(this, event, {
           x: -124,
-          y: 16.5
+          y: 17.5
         });
       }
       

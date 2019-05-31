@@ -67,7 +67,7 @@ export default new Vuex.Store({
 
     // 1是按照最新发布排序  2 是按照最快上升排序  3 是按照评分高的排序
     sortOrder: 1,
-
+    cdnInfo: null
   },
   mutations: {
 

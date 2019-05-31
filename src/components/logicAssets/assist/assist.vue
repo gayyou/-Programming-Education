@@ -13,7 +13,7 @@
     dy="-3.7"
     dx="20"
     text-anchor="middle"
-  >{{ value }}</text>
+  >{{ value[0][0] }}</text>
   </g>
 </template>
 

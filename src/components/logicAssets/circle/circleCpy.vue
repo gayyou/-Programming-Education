@@ -15,6 +15,7 @@
         <path class="st0 choice-path" d="M138,48H12C5.4,48,0,42.6,0,36V12C0,5.4,5.4,0,12,0l126,0c13.3,0,24,10.7,24,24v0C162,37.3,151.3,48,138,48z"	/>
         <path class="st0 layer" transform="translate(-60,0.6) scale(0.98)" d="M138,48H12C5.4,48,0,42.6,0,36V12C0,5.4,5.4,0,12,0l126,0c13.3,0,24,10.7,24,24v0C162,37.3,151.3,48,138,48z"	/>
       </g>
+      <polygon class="st1" transform="translate(155, 11) scale(0.8)" :style="hasCdn ? 'display: block' : 'display: none'" points="159,0 15,0 0,17 15,34 159,34 174,17 	"/>
       <text transform="matrix(1 0 0 1 23.3337 30.7092)" class="st2 st3 st4">执行命令直到</text>
     </g>
     <noRefFunc
@@ -50,6 +51,18 @@
         :hasCdn="item.hasCdn"
         :svgOptions="item.svgOptions"
       ></judge>
+    </template>
+    <template  v-if="$data.contain.inOrder.length != 0">
+      <inOrder
+        v-for="item in $data.contain.inOrder"
+        :key="item.id"
+        :containObject="item.contain"
+        :y="item.y"
+        :x="item.x"
+        :id="item.id"
+        :value="item.value"
+        :svgOptions="item.svgOptions"
+      ></inOrder>
     </template>
     <assist
       v-for="item in $data.contain.assist"
@@ -123,9 +136,10 @@ import order from '../order/order.vue'
 import doubleRef from '../doubleRef/doubleRef.vue'
 import longRefFunc from '../longRefFunc/longRefFunc.vue'
 import longRightRef from '../longRightRef/longRightRef.vue'
+import inOrder from '../inOrder/inOrder.vue'
 
 export default {
-  name: 'circles',
+  name: 'circlesCpy',
   props: ['model', 'y', 'value', 'containObject', 'x', 'id', 'hasCdn', 'svgOptions'],
   components: {
     noRefFunc,
@@ -136,7 +150,8 @@ export default {
     circles,
     longRightRef,
     longRefFunc,
-    doubleRef
+    doubleRef,
+    inOrder
   },
   data() {
     return {
@@ -147,7 +162,8 @@ export default {
         order: [],
         assist: [],
         noRefFunc: [],
-        circle: []
+        circle: [],
+        inOrder: []
       }
     }
   },

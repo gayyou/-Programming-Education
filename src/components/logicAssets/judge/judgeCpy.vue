@@ -22,7 +22,7 @@
       <text transform="matrix(1 0 0 1 24.3335 30.3763)" class="st1 st2 st3">如果</text>
       <text :transform="'matrix(1 0 0 1 24.3335 ' + svgOptions.textBash + ')'" class="st1 st2 st3 else">否则</text>
       <polygon class="st4" :style="hasCdn ? 'display: none' : 'display: block'" points="106,12.3 82,12.3 70,25.3 82,38.3 106,38.3 118,25.3 	"/>
-      
+      <polygon class="st4" transform="translate(100, 11) scale(0.8)" :style="hasCdn ? 'display: block' : 'display: none'" points="159,0 15,0 0,17 15,34 159,34 174,17 	"/>
     </g>
     <noRefFunc
       v-for="item in $data.contain.noRefFunc"
@@ -57,6 +57,18 @@
         :hasCdn="item.hasCdn"
         :svgOptions="item.svgOptions"
       ></judge>
+    </template>
+    <template  v-if="$data.contain.inOrder.length != 0">
+      <inOrder
+        v-for="item in $data.contain.inOrder"
+        :key="item.id"
+        :containObject="item.contain"
+        :y="item.y"
+        :x="item.x"
+        :id="item.id"
+        :value="item.value"
+        :svgOptions="item.svgOptions"
+      ></inOrder>
     </template>
     <assist
       v-for="item in $data.contain.assist"
@@ -131,9 +143,10 @@ import order from '../order/order.vue'
 import doubleRef from '../doubleRef/doubleRef.vue'
 import longRefFunc from '../longRefFunc/longRefFunc.vue'
 import longRightRef from '../longRightRef/longRightRef.vue'
+import inOrder from '../inOrder/inOrder.vue'
 
 export default {
-  name: 'circles',
+  name: 'judgeCpy',
   props: ['model', 'y', 'value', 'containObject', 'x', 'id', 'hasCdn', 'svgOptions'],
   components: {
     noRefFunc,
@@ -144,7 +157,8 @@ export default {
     circles,
     longRightRef,
     longRefFunc,
-    doubleRef
+    doubleRef,
+    inOrder
   },
   data() {
     return {
@@ -155,7 +169,8 @@ export default {
         order: [],
         assist: [],
         noRefFunc: [],
-        circle: []
+        circle: [],
+        inOrder: []
       }
     }
   },
