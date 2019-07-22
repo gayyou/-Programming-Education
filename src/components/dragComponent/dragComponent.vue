@@ -277,14 +277,14 @@
         :y="$store.state.model.y"
         :x="$store.state.model.x"
       ></noRefFunc>
-      <order
+      <!-- <order
         id="fake-order"
         v-if="$store.state.model.type === 'order'"
         :model="true"
         :value="$store.state.model.value"
         :y="$store.state.model.y"
         :x="$store.state.model.x"
-      ></order>
+      ></order> -->
       <doubleRef
         id="fake-doubleRef"
         v-if="$store.state.model.type === 'doubleRef'"
@@ -393,7 +393,7 @@
         :y="40"
         :x="20"
       ></condition>
-      <condition
+      <!-- <condition
         :model="true"
         :value="[['前方存在障碍物'], ['check_thing(100)']]"
         :y="90"
@@ -404,7 +404,7 @@
         :value="[['前方为红色物品'], ['True']]"
         :y="140"
         :x="20"
-      ></condition>
+      ></condition> -->
       <!-- <condition
         :model="true"
         :value="'左方存在障碍物'"

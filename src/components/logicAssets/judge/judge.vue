@@ -136,8 +136,8 @@ import { eventMixin, initMixin, createModelMixin } from '../../../utils/mixin.js
 import { componentListMixin } from '../../../utils/shared/listUtils.js'
 import noRefFunc from '../noRefFunc/noRefFunc.vue'
 import condition from '../condition/condition.vue'
-import judge from '../judge/judgeCpy.vue'
-import circles from '../circle/circleCpy.vue'
+import judge from '../judge/judge.vue'
+// import circles from '../circle/circle.vue'
 import assist from '../assist/assist.vue'
 import order from '../order/order.vue'
 import doubleRef from '../doubleRef/doubleRef.vue'
@@ -154,7 +154,7 @@ export default {
     judge,
     assist,
     order,
-    circles,
+    // circles,
     longRightRef,
     longRefFunc,
     doubleRef,
@@ -176,6 +176,9 @@ export default {
         doubleRef: []
       }
     }
+  },
+  beforeCreate() {
+    this.$options.components.circles = require('../circle/circle.vue').default
   },
   mounted() {
     if (this.model) {

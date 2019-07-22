@@ -1,6 +1,6 @@
 <template>
   <div class="float-layer" 
-    v-if="$store.state.showLogin || $store.state.showRegist || $store.state.showConfirm || $store.state.showMessage"
+    v-if="$store.state.showConfirm || $store.state.showMessage || $store.state.showLogin || $store.state.showRegist"
   >
     <login v-if="$store.state.showLogin"></login>
     <regist v-if="$store.state.showRegist" ></regist>

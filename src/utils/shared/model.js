@@ -112,7 +112,6 @@ function getWhileStn(item, tabLevel) {
       data = [];
 
   insertSort(childList);
-  console.log('childList', childList);
   for (let i = 0; i < childList.length; i++) {
     if (childList[i].type == 'condition') {
       continue;
@@ -208,16 +207,3 @@ function codeItem(item, nestLevel) {
     children: item.contain ? getSentence(item, nestLevel) : []
   }
 }
-
-/**
- * 
- * @param {} advice 
- */
-export function dataToView(advice) {
-  return viewItem(advice);
-}
-
-function viewItem(codeItem) {
-  
-}
-
