@@ -22,7 +22,7 @@
     "babel-preset-flow": "^6.23.0",
     "element-ui": "^2.7.2",
     "flow-bin": "^0.99.1",
-    "node-sass": "^4.11.0",
+    "node-sass": "^4.13.1",
     "pubsub-js": "^1.7.0",
     "sass-loader": "^7.1.0",
     "scss-loader": "0.0.1",
